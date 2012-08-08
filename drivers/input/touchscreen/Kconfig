@@ -790,6 +790,18 @@ config TOUCHSCREEN_EDT_FT5X06
 	  To compile this driver as a module, choose M here: the
 	  module will be called edt-ft5x06.
 
+
+config TOUCHSCREEN_GEN_VKEYS
+	tristate "Touchscreen Virtual Keys Driver"
+	help
+         Say Y here if you want to generate a sysfs entry for virtual
+	 keys on Android.
+
+	 If unsure, say N.
+
+	 To compile this driver as a module, choose M here: the
+	 module will be called gen_vkeys.
+
 config TOUCHSCREEN_RASPBERRYPI_FW
 	tristate "Raspberry Pi's firmware base touch screen support"
 	depends on RASPBERRYPI_FIRMWARE || (RASPBERRYPI_FIRMWARE=n && COMPILE_TEST)
