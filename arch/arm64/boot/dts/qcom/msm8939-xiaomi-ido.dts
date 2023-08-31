@@ -2,14 +2,13 @@
 
 /dts-v1/;
 
-#include "msm8939.dtsi"
-#include "pm8916.dtsi"
+#include "msm8939-pm8916.dtsi"
+#include "msm8916-modem.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/qcom,pmic-mpp.h>
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/sound/apq8016-lpass.h>
 #include <dt-bindings/power/summit,smb347-charger.h>
-#include "msm8916-modem.dtsi"
 
 / {
 	model = "Xiaomi Redmi 3";
@@ -47,7 +46,9 @@ panel {
 
 */
 	aliases {
-		serial0 = &blsp1_uart2;
+		mmc0 = &sdhc_1; /* eMMC */
+		mmc1 = &sdhc_2; /* SD card */
+		serial0 = &blsp_uart2;
 	};
 
 	chosen {
@@ -72,7 +73,6 @@ panel {
 	};
 
     reserved-memory {
-
         /delete-node/ rmtfs@86681000;
 		/delete-node/ rfsa@867e0000;
 		/delete-node/ tz-apps@86000000;
@@ -114,7 +114,7 @@ ramoops@xdfe00000 {
 
 		volume-up {
 			label = "Volume Up";
-			gpios = <&msmgpio 107 GPIO_ACTIVE_LOW>;
+			gpios = <&tlmm 107 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_VOLUMEUP>;
 		};
 	};
@@ -122,13 +122,14 @@ ramoops@xdfe00000 {
     bat: battery {
         compatible = "simple-battery";
         charge-full-design-microamp-hours = <4000000>;
-	voltage-min-design-microvolt = <3400000>;
 	voltage-max-design-microvolt = <4400000>;
+	voltage-min-design-microvolt = <3400000>;
+	constant-charge-current-max-microamp = <1800000>;
     };
 
     usb_id: usb-id {
 		compatible = "linux,extcon-usb-gpio";
-		id-gpio = <&msmgpio 110 GPIO_ACTIVE_HIGH>;
+		id-gpio = <&tlmm 110 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&usb_id_default>;
 	};
@@ -147,7 +148,7 @@ ramoops@xdfe00000 {
 	status = "okay";
 };
 
-&blsp1_uart2 {
+&blsp_uart2 {
 	status = "disabled";
 };
 
@@ -165,7 +166,7 @@ ramoops@xdfe00000 {
 			regulator-name = "outp";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			enable-gpios = <&msmgpio 97 GPIO_ACTIVE_HIGH>;
+			enable-gpios = <&tlmm 97 GPIO_ACTIVE_HIGH>;
 			regulator-active-discharge = <1>;
 		};
 
@@ -173,7 +174,7 @@ ramoops@xdfe00000 {
 			regulator-name = "outn";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			enable-gpios = <&msmgpio 98 GPIO_ACTIVE_HIGH>;
+			enable-gpios = <&tlmm 98 GPIO_ACTIVE_HIGH>;
 			regulator-active-discharge = <1>;
 		};
 	};
@@ -190,8 +191,10 @@ ramoops@xdfe00000 {
 		summit,enable-charge-control = <SMB3XX_CHG_ENABLE_PIN_ACTIVE_HIGH>;
 		summit,soft-compensation-method = <SMB3XX_SOFT_TEMP_COMPENSATE_CURRENT>;
 		summit,chip-temperature-threshold-celsius = <100>;
+		summit,mains-current-limit-microamp = <1800000>;
+		summit,usb-current-limit-microamp = <1800000>;
 		summit,enable-usb-charging;
-		summit,enable-apsd;
+		summit,enable-mains-charging;
 
 		monitored-battery = <&bat>;
 
@@ -203,7 +206,7 @@ ramoops@xdfe00000 {
 			regulator-max-microamp = <750000>;
 		};
 	};
-
+/*
 	cw2015@62 {
 		compatible = "cellwise,cw2015";
 		reg = <0x62>;
@@ -221,6 +224,7 @@ ramoops@xdfe00000 {
 		monitored-battery = <&bat>;
 		power-supplies = <&power_supply>;
 	};
+*/
 };
 
 /*
@@ -255,13 +259,13 @@ ramoops@xdfe00000 {
 		compatible = "edt,edt-ft5306";
 		reg = <0x3e>;
 
-		interrupt-parent = <&msmgpio>;
+		interrupt-parent = <&tlmm>;
 		interrupts = <13 0x2008>;
 
 		vcc-supply = <&pm8916_l17>;
 		iovcc-supply = <&pm8916_l6>;
 
-		reset-gpios = <&msmgpio 12 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&tlmm 12 GPIO_ACTIVE_LOW>;
 
 		touchscreen-size-x = <720>;
 		touchscreen-size-y = <1280>;
@@ -322,10 +326,10 @@ panel: panel@0 {
 		reg = <0>;
 		
 		power-supply = <&pm8916_l17>;
-		//backlight = <&backlight>;
+		backlight = <&backlight>;
 		vsp-supply = <&reg_lcd_pos>;
 		vsn-supply = <&reg_lcd_neg>;
-		reset-gpios = <&msmgpio 25 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&tlmm 25 GPIO_ACTIVE_LOW>;
 ports {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -333,13 +337,13 @@ ports {
 		port@0 {
 			reg = <0>;
 			panel_in: endpoint {
-				remote-endpoint = <&dsi0_out>;
+				remote-endpoint = <&mdss_dsi0_out>;
 				};
 			};
 		};
 	};
 };
-&dsi0_out {
+&mdss_dsi0_out {
 	data-lanes = <0 1 2 3>;
 	remote-endpoint = <&panel_in>;
 };
@@ -347,7 +351,10 @@ ports {
 &mdss_dsi0_phy {
 	status = "okay";
 	qcom,dsi-phy-regulator-ldo-mode;
-	vddio-supply = <&pm8916_l6>;
+};
+
+&gpu {
+	status = "okay";
 };
 
 &mdss {
@@ -375,34 +382,25 @@ ports {
 	status = "okay";
 };
 
-&pronto {
+&wcnss {
 	status = "okay";
 };
 
 &sdhc_1 {
 	status = "okay";
-
-	vmmc-supply = <&pm8916_l8>;
-	vqmmc-supply = <&pm8916_l5>;
-
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&sdc1_clk_on &sdc1_cmd_on &sdc1_data_on>;
-	pinctrl-1 = <&sdc1_clk_off &sdc1_cmd_off &sdc1_data_off>;
 };
 
 &sdhc_2 {
 	status = "okay";
 
-	vmmc-supply = <&pm8916_l11>;
-	vqmmc-supply = <&pm8916_l12>;
-
+	pinctrl-0 = <&sdc2_default &sdc2_cd_default>;
+	pinctrl-1 = <&sdc2_sleep &sdc2_cd_default>;
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on &sdc2_cd_on>;
-	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
 
-	cd-gpios = <&msmgpio 38 GPIO_ACTIVE_HIGH>;
+	cd-gpios = <&tlmm 38 GPIO_ACTIVE_HIGH>;
 };
 
+/*
 &lpass {
 	status = "okay";
 };
@@ -411,8 +409,8 @@ ports {
 	status = "okay";
 
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&cdc_pdm_lines_act>;
-	pinctrl-1 = <&cdc_pdm_lines_sus>;
+	pinctrl-0 = <&cdc_pdm_default>;
+	pinctrl-1 = <&cdc_pdm_sleep>;
 
 	model = "msm8939-snd-card-skuk";
 	qcom,model = "msm8939-snd-card-skuk";
@@ -428,26 +426,26 @@ ports {
 		"AMIC3","MIC BIAS External";
 
 	internal-dai-link@0 {
-		cpu { /* PRIMARY */
+		cpu { 
 			sound-dai = <&lpass MI2S_PRIMARY>;
 		};
 		codec {
-			sound-dai = <&lpass_codec 0>, <&wcd_codec 0>;
+			sound-dai = <&lpass_codec 0>, <&pm8916_codec 0>;
 		};
 	};
 };
 
-&wcd_codec {
+&pm8916_codec {
 	qcom,micbias-lvl = <2800>;
-	qcom,mbhc-vthreshold-low = <75 150 237 450 500>;
-	qcom,mbhc-vthreshold-high = <75 150 237 450 500>;
-
+	qcom,mbhc-vthreshold-low = <75 100 120 180 500>;
+	qcom,mbhc-vthreshold-high = <75 100 120 180 500>;
+	qcom,hphl-jack-type-normally-open;
 };
-
+*/
 &usb {
 	status = "okay";
-	extcon = <&power_supply>, <&usb_id>;
-	vbus-supply = <&power_supply>;
+	extcon = <&usb_id>, <&usb_id>;
+	//vbus-supply = <&power_supply>;
 };
 
 &usb_hs_phy {
@@ -459,31 +457,10 @@ ports {
 };
 
 
-&rpm_requests {
-	smd_rpm_regulators: pm8916-regulators {
-		compatible = "qcom,rpm-pm8916-regulators";
-		vdd_l1_l2_l3-supply = <&pm8916_s3>;
-		vdd_l4_l5_l6-supply = <&pm8916_s4>;
-		vdd_l7-supply = <&pm8916_s4>;
-
-		pm8916_s3: s3 {
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <1300000>;
-		};
-
-		pm8916_s4: s4 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <2100000>;
-		};
-
-		pm8916_l1: l1 {
+&pm8916_rpm_regulators {
+		l1 {
 			regulator-min-microvolt = <1225000>;
 			regulator-max-microvolt = <1225000>;
-		};
-
-		pm8916_l2: l2 {
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <1200000>;
 		};
 
 		pm8916_l4: l4 {
@@ -491,52 +468,9 @@ ports {
 			regulator-max-microvolt = <2050000>;
 		};
 
-		pm8916_l5: l5 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-		};
-
-		pm8916_l6: l6 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-			regulator-always-on;
-		};
-
-		pm8916_l7: l7 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-		};
-
-		pm8916_l8: l8 {
-			regulator-min-microvolt = <2850000>;
-			regulator-max-microvolt = <2900000>;
-		};
-
-		pm8916_l9: l9 {
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-		};
-
 		pm8916_l10: l10 {
 			regulator-min-microvolt = <2700000>;
 			regulator-max-microvolt = <2800000>;
-		};
-
-		pm8916_l11: l11 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <2950000>;
-			regulator-allow-set-load;
-			regulator-system-load = <200000>;
-		};
-
-		pm8916_l12: l12 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <2950000>;
-		};
-
-		pm8916_l13: l13 {
-			regulator-min-microvolt = <3075000>;
-			regulator-max-microvolt = <3075000>;
 		};
 
 		pm8916_l14: l14 {
@@ -565,9 +499,8 @@ ports {
 			regulator-max-microvolt = <2700000>;
 		};
 	};
-};
 
-&msmgpio {
+&tlmm {
 	usb_id_default: usb-id-default {
 		pins = "gpio110";
 		function = "gpio";
@@ -601,7 +534,7 @@ smb_int_default: smb-int-default-state {
 		};
 	};
 
-    touchscreen_default: touchscreen-default {
+touchscreen_default: touchscreen-default {
 		pins = "gpio13";
 		function = "gpio";
 
@@ -617,12 +550,19 @@ smb_int_default: smb-int-default-state {
 		};
 	};
 
-    tps65132_en_default: tps65132-en-default {
+	tps65132_en_default: tps65132-en-default {
 		pins = "gpio97", "gpio98";
 		function = "gpio";
 
 		drive-strength = <2>;
 		bias-pull-down;
+	};
+
+	sdc2_cd_default: sdc2-cd-default-state {
+		pins = "gpio38";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-disable;
 	};
 };
 
