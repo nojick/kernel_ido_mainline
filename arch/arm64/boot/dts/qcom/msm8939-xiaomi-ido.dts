@@ -97,12 +97,6 @@ ramoops@xdfe00000 {
 			reg = <0x0 0x8c400000 0x0 0x1900000>;
 			no-map;
 		};
-	
-	gps_mem: gps@8cc00000 {
-			reg = <0x0 0x8cc00000 0x0 0x200000>;
-			no-map;
-		};
-	
 	};
 
     gpio-keys {
@@ -274,10 +268,6 @@ ramoops@xdfe00000 {
 		pinctrl-0 = <&touchscreen_default>;
 	};
 };
-
-&blsp_spi6 {
-	status = "okay";
-	};
 
 &blsp_i2c6 {
 	status = "okay";
