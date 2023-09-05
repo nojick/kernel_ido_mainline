@@ -279,9 +279,8 @@ ramoops@xdfe00000 {
 		compatible = "awinic,aw2013";
 
 		reg = <0x45>;
-
-		vcc-supply = <&pm8916_l6>;
-
+		vcc-supply = <&pm8916_l16>;
+		vio-supply = <&pm8916_l16>;
 		led@0 {
 			reg = <0>;
 			led-max-microamp = <5000>;
@@ -474,8 +473,8 @@ ports {
 		};
 
 		pm8916_l16: l16 {
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <3300000>;
+			regulator-min-microvolt = <2600000>;
+			regulator-max-microvolt = <2600000>;
 		};
 
 		pm8916_l17: l17 {
