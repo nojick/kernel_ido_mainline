@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2020-2023, Linaro Limited
  */
 
-#include <dt-bindings/arm/coresight-cti-dt.h>
 #include <dt-bindings/clock/qcom,gcc-msm8939.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
 #include <dt-bindings/interconnect/qcom,msm8939.h>
@@ -17,78 +17,13 @@
 / {
 	interrupt-parent = <&intc>;
 
+	/*
+	 * Stock LK wants address-cells/size-cells = 2
+	 * A number of our drivers want address/size cells = 1
+	 * hence the disparity between top-level and /soc below.
+	 */
 	#address-cells = <2>;
 	#size-cells = <2>;
-
-	memory@80000000 {
-		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
-		reg = <0 0x80000000 0 0>;
-	};
-
-	reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		tz-apps@86000000 {
-			reg = <0x0 0x86000000 0x0 0x300000>;
-			no-map;
-		};
-
-		smem_mem: smem_region@86300000 {
-			reg = <0x0 0x86300000 0x0 0x100000>;
-			no-map;
-		};
-
-		hypervisor@86400000 {
-			reg = <0x0 0x86400000 0x0 0x100000>;
-			no-map;
-		};
-
-		tz@86500000 {
-			reg = <0x0 0x86500000 0x0 0x180000>;
-			no-map;
-		};
-
-		reserved@86680000 {
-			reg = <0x0 0x86680000 0x0 0x1000>;
-			no-map;
-		};
-
-		rmtfs@86681000 {
-			compatible = "qcom,rmtfs-mem";
-			reg = <0x0 0x86681000 0x0 0x15f000>;
-			no-map;
-
-			qcom,client-id = <1>;
-		};
-
-		rfsa@867e0000 {
-			reg = <0x0 0x867e0000 0x0 0x20000>;
-			no-map;
-		};
-
-		mpss_mem: mpss@86800000 {
-			reg = <0x0 0x86800000 0x0 0x5600000>;
-			no-map;
-		};
-
-		wcnss_mem: wcnss@8be00000 {
-			reg = <0x0 0x8be00000 0x0 0x600000>;
-			no-map;
-		};
-
-		mba_mem: mba@8ea00000 {
-			reg = <0x0 0x8ea00000 0x0 0x100000>;
-			no-map;
-		};
-
-		venus_mem: venus@90000000 {
-			reg = <0x0 0x90000000 0x0 0x600000>;
-			no-map;
-		};	
-	};
 
 	clocks {
 		xo_board: xo-board {
@@ -108,173 +43,121 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		cpu-map {
-			cluster0 {	/* little */
-				core0 {
-					cpu = <&CPU4>;
-				};
-				core1 {
-					cpu = <&CPU5>;
-				};
-				core2 {
-					cpu = <&CPU6>;
-				};
-				core3 {
-					cpu = <&CPU7>;
-				};
-			};
-
-			cluster1 {	/* BIG */
-				core0 {
-					cpu = <&CPU0>;
-				};
-				core1 {
-					cpu = <&CPU1>;
-				};
-				core2 {
-					cpu = <&CPU2>;
-				};
-				core3 {
-					cpu = <&CPU3>;
-				};
-			};
-		};
-
 		CPU0: cpu@100 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x100>;
 			next-level-cache = <&L2_1>;
-			enable-method = "spin-table";
-			clocks = <&apcs_mbox>;
-			//operating-points-v2 = <&cpu_opp_table>;
 			//qcom,acc = <&acc0>;
 			//qcom,saw = <&saw0>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu0_acc>;
-			qcom,saw = <&cpu0_saw>;
-			cpu-idle-states = <&CPU_SPC>;
+			L2_1: l2-cache {
+				compatible = "cache";
+				cache-level = <2>;
+			};
 		};
 
 		CPU1: cpu@101 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x101>;
 			next-level-cache = <&L2_1>;
-			enable-method = "spin-table";
-			clocks = <&apcs_mbox>;
-			//operating-points-v2 = <&cpu_opp_table>;
 			//qcom,acc = <&acc1>;
 			//qcom,saw = <&saw1>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu1_acc>;
-			qcom,saw = <&cpu1_saw>;
 		};
 
 		CPU2: cpu@102 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x102>;
 			next-level-cache = <&L2_1>;
-			enable-method = "spin-table";
-			clocks = <&apcs_mbox>;
-			//operating-points-v2 = <&cpu_opp_table>;
 			//qcom,acc = <&acc2>;
 			//qcom,saw = <&saw2>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu2_acc>;
-			qcom,saw = <&cpu2_saw>;
 		};
 
 		CPU3: cpu@103 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x103>;
 			next-level-cache = <&L2_1>;
-			enable-method = "spin-table";
-			clocks = <&apcs_mbox>;
-			//operating-points-v2 = <&cpu_opp_table>;
 			//qcom,acc = <&acc3>;
 			//qcom,saw = <&saw3>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu3_acc>;
-			qcom,saw = <&cpu3_saw>;
 		};
 
 		CPU4: cpu@0 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
-			reg = <0x0>;
-			next-level-cache = <&L2_0>;
+			device_type = "cpu";
 			enable-method = "spin-table";
-			clocks = <&apcs0>;
-			//operating-points-v2 = <&cpu_opp_table_little>;
+			reg = <0x0>;
 			//qcom,acc = <&acc4>;
 			//qcom,saw = <&saw4>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu4_acc>;
-			qcom,saw = <&cpu4_saw>;
+			next-level-cache = <&L2_0>;
+			L2_0: l2-cache {
+				compatible = "cache";
+				cache-level = <2>;
+			};
 		};
 
 		CPU5: cpu@1 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x1>;
 			next-level-cache = <&L2_0>;
-			enable-method = "spin-table";
-			clocks = <&apcs0>;
-			//operating-points-v2 = <&cpu_opp_table_little>;
 			//qcom,acc = <&acc5>;
 			//qcom,saw = <&saw5>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu5_acc>;
-			qcom,saw = <&cpu5_saw>;
 		};
 
 		CPU6: cpu@2 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x2>;
 			next-level-cache = <&L2_0>;
-			enable-method = "spin-table";
-			clocks = <&apcs0>;
-			//operating-points-v2 = <&cpu_opp_table_little>;
 			//qcom,acc = <&acc6>;
 			//qcom,saw = <&saw6>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu6_acc>;
-			qcom,saw = <&cpu6_saw>;
 		};
 
 		CPU7: cpu@3 {
-			device_type = "cpu";
 			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
 			reg = <0x3>;
 			next-level-cache = <&L2_0>;
-			enable-method = "spin-table";
-			clocks = <&apcs0>;
-			//operating-points-v2 = <&cpu_opp_table_little>;
 			//qcom,acc = <&acc7>;
 			//qcom,saw = <&saw7>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
-			qcom,acc = <&cpu7_acc>;
-			qcom,saw = <&cpu7_saw>;
-		};
-
-		L2_0: l2-cache { /* little cluster */
-			compatible = "cache";
-			cache-level = <2>;
-		};
-
-		L2_1: l2-cache-1 { /* BIG cluster */
-			compatible = "cache";
-			cache-level = <2>;
 		};
 
 		idle-states {
-			CPU_SPC: spc {
-				compatible = "arm,idle-state";
-				arm,psci-suspend-param = <0x40000002>;
+			CPU_SLEEP_0: cpu-sleep-0 {
+				compatible ="qcom,idle-state-spc", "arm,idle-state";
 				entry-latency-us = <130>;
 				exit-latency-us = <150>;
 				min-residency-us = <2000>;
@@ -283,246 +166,56 @@
 		};
 	};
 
-	cpu_opp_table: cpu-opp-table {
-		compatible = "operating-points-v2";
-		opp-shared;
+	/*
+	 * MSM8939 has a big.LITTLE heterogeneous computing architecture,
+	 * consisting of two clusters of four ARM Cortex-A53s each. The
+	 * LITTLE cluster runs at 1.0-1.2GHz, and the big cluster runs
+	 * at 1.5-1.7GHz.
+	 *
+	 * The enable method used here is spin-table which presupposes use
+	 * of a 2nd stage boot shim such as lk2nd to have installed a
+	 * spin-table, the downstream non-psci/non-spin-table method that
+	 * default msm8916/msm8936/msm8939 will not be supported upstream.
+	 */
+	cpu-map {
+		/* LITTLE (efficiency) cluster */
+		cluster0 {
+			core0 {
+				cpu = <&CPU4>;
+			};
 
-		opp-200000000 {
-			opp-hz = /bits/ 64 <200000000>;
-		};
-		opp-345600000 {
-			opp-hz = /bits/ 64 <345600000>;
-		};
-		opp-400000000 {
-			opp-hz = /bits/ 64 <400000000>;
-		};
-		opp-533330000 {
-			opp-hz = /bits/ 64 <533330000>;
-		};
-		opp-800000000 {
-			opp-hz = /bits/ 64 <800000000>;
-		};
-		opp-960000000 {
-			opp-hz = /bits/ 64 <960000000>;
-		};
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-		/*
-		opp-1344000000 {
-			opp-hz = /bits/ 64 <1344000000>;
-		};
-		opp-1459200000 {
-			opp-hz = /bits/ 64 <1459200000>;
-		};
-		opp-1497600000 {
-			opp-hz = /bits/ 64 <1497600000>;
-		};
-		opp-1651200000 {
-			opp-hz = /bits/ 64 <1651200000>;
-		};
-		*/
-	};
+			core1 {
+				cpu = <&CPU5>;
+			};
 
-	cpu_opp_table_little: cpu-opp-table-little {
-		compatible = "operating-points-v2";
-		opp-shared;
+			core2 {
+				cpu = <&CPU6>;
+			};
 
-		opp-200000000 {
-			opp-hz = /bits/ 64 <200000000>;
-		};
-		opp-249600000 {
-			opp-hz = /bits/ 64 <249600000>;
-		};
-		opp-499200000 {
-			opp-hz = /bits/ 64 <499200000>;
-		};
-		opp-800000000 {
-			opp-hz = /bits/ 64 <800000000>;
-		};
-		/*
-		opp-998400000 {
-			opp-hz = /bits/ 64 <998400000>;
-		};
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-		*/
-	};
-
-	a53pllc0_opp_table: a53pllc0-opp-table {
-		compatible = "operating-points-v2";
-
-		opp-998400000 {
-			opp-hz = /bits/ 64 <998400000>;
+			core3 {
+				cpu = <&CPU7>;
+			};
 		};
 
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
+		/* big (performance) cluster */
+		/* Boot CPU is cluster 1 core 0 */
+		cluster1 {
+			core0 {
+				cpu = <&CPU0>;
+			};
+
+			core1 {
+				cpu = <&CPU1>;
+			};
+
+			core2 {
+				cpu = <&CPU2>;
+			};
+
+			core3 {
+				cpu = <&CPU3>;
+			};
 		};
-
-		opp-1209600000 {
-			opp-hz = /bits/ 64 <1209600000>;
-		};
-	};
-
-	a53pllc1_opp_table: a53pllc1-opp-table {
-		compatible = "operating-points-v2";
-
-		opp-652800000 {
-			opp-hz = /bits/ 64 <652800000>;
-		};
-
-		opp-691200000 {
-			opp-hz = /bits/ 64 <691200000>;
-		};
-
-		opp-729600000 {
-			opp-hz = /bits/ 64 <729600000>;
-		};
-
-		opp-806400000 {
-			opp-hz = /bits/ 64 <806400000>;
-		};
-
-		opp-844800000 {
-			opp-hz = /bits/ 64 <844800000>;
-		};
-
-		opp-883200000 {
-			opp-hz = /bits/ 64 <883200000>;
-		};
-
-		opp-960000000 {
-			opp-hz = /bits/ 64 <960000000>;
-		};
-
-		opp-998400000 {
-			opp-hz = /bits/ 64 <998400000>;
-		};
-
-		opp-1036800000 {
-			opp-hz = /bits/ 64 <1036800000>;
-		};
-
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-
-		opp-1190400000 {
-			opp-hz = /bits/ 64 <1190400000>;
-		};
-
-		opp-1209600000 {
-			opp-hz = /bits/ 64 <1209600000>;
-		};
-
-		opp-1267200000 {
-			opp-hz = /bits/ 64 <1267200000>;
-		};
-
-		opp-1344000000 {
-			opp-hz = /bits/ 64 <1344000000>;
-		};
-
-		opp-1363200000 {
-			opp-hz = /bits/ 64 <1363200000>;
-		};
-
-		opp-1420800000 {
-			opp-hz = /bits/ 64 <1420800000>;
-		};
-
-		opp-1459200000 {
-			opp-hz = /bits/ 64 <1459200000>;
-		};
-
-		opp-1497600000 {
-			opp-hz = /bits/ 64 <1497600000>;
-		};
-
-		opp-1536000000 {
-			opp-hz = /bits/ 64 <1536000000>;
-		};
-
-		opp-1574400000 {
-			opp-hz = /bits/ 64 <1574400000>;
-		};
-
-		opp-1612800000 {
-			opp-hz = /bits/ 64 <1612800000>;
-		};
-
-		opp-1632000000 {
-			opp-hz = /bits/ 64 <1632000000>;
-		};
-
-		opp-1651200000 {
-			opp-hz = /bits/ 64 <1651200000>;
-		};
-
-		opp-1689600000 {
-			opp-hz = /bits/ 64 <1689600000>;
-		};
-
-		opp-1708800000 {
-			opp-hz = /bits/ 64 <1708800000>;
-		};
-	};
-
-	a53pllcci_opp_table: a53pllcci-opp-table {
-		compatible = "operating-points-v2";
-
-		opp-403200000 {
-			opp-hz = /bits/ 64 <403200000>;
-		};
-
-		opp-595200000 {
-			opp-hz = /bits/ 64 <595200000>;
-		};
-	};
-
-	cci_opp_table: cci-opp-table {
-		compatible = "operating-points-v2";
-
-		opp-200000000 {
-			opp-hz = /bits/ 64 <200000000>;
-		};
-
-		opp-297600000 {
-			opp-hz = /bits/ 64 <297600000>;
-		};
-
-		opp-400000000 {
-			opp-hz = /bits/ 64 <400000000>;
-		};
-
-		opp-595200000 {
-			opp-hz = /bits/ 64 <595200000>;
-		};
-
-		/* Frequency mapping between cci and cluster/cpu */
-		/*
-		cpu-to-dev-map-0 =
-			<  200000  200000 >,
-			<  345600  200000 >,
-			<  400000  200000 >,
-			<  533330  297600 >,
-			<  800000  297600 >,
-			<  960000  297600 >,
-			< 1113600  297000 >,
-			< 1344000  595200 >,
-			< 1459200  595200 >,
-			< 1497600  595200 >,
-			< 1651200  595200 >;
-		cpu-to-dev-map-4 =
-			<  200000 200000 >,
-			<  249600 200000 >,
-			<  499200 297600 >,
-			<  800000 297600 >,
-			<  998400 595200 >,
-			< 1113600 595200 >;
-		*/
 	};
 
 	firmware {
@@ -536,6 +229,12 @@
 
 			qcom,dload-mode = <&tcsr 0x6100>;
 		};
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		/* We expect the bootloader to fill in the reg */
+		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
 	memshare: memshare {
@@ -556,13 +255,110 @@
 
 			memshare_gps: gps@0 {
 				reg = <0>;
+				memory-region = <&gps_mem>;
 			};
 		};
 	};
 
 	pmu {
 		compatible = "arm,cortex-a53-pmu";
-		interrupts = <GIC_PPI 7 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_HIGH)>;
+		interrupts = <GIC_PPI 7 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_HIGH)>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		tz-apps@86000000 {
+			reg = <0x0 0x86000000 0x0 0x300000>;
+			no-map;
+		};
+
+		smem@86300000 {
+			compatible = "qcom,smem";
+			reg = <0x0 0x86300000 0x0 0x100000>;
+			no-map;
+
+			hwlocks = <&tcsr_mutex 3>;
+			qcom,rpm-msg-ram = <&rpm_msg_ram>;
+		};
+
+		hypervisor@86400000 {
+			reg = <0x0 0x86400000 0x0 0x100000>;
+			no-map;
+		};
+
+		tz@86500000 {
+			reg = <0x0 0x86500000 0x0 0x180000>;
+			no-map;
+		};
+
+		reserved@86680000 {
+			reg = <0x0 0x86680000 0x0 0x80000>;
+			no-map;
+		};
+
+		rmtfs@86700000 {
+			compatible = "qcom,rmtfs-mem";
+			reg = <0x0 0x86700000 0x0 0xe0000>;
+			no-map;
+
+			qcom,client-id = <1>;
+		};
+
+		rfsa@867e0000 {
+			reg = <0x0 0x867e0000 0x0 0x20000>;
+			no-map;
+		};
+
+		mpss_mem: mpss@86800000 {
+			/*
+			 * The memory region for the mpss firmware is generally
+			 * relocatable and could be allocated dynamically.
+			 * However, many firmware versions tend to fail when
+			 * loaded to some special addresses, so it is hard to
+			 * define reliable alloc-ranges.
+			 *
+			 * alignment = <0x0 0x400000>;
+			 * alloc-ranges = <0x0 0x86800000 0x0 0x8000000>;
+			*/
+			reg = <0x0 0x86800000 0x0 0>; /* size is device-specific */
+			no-map;
+			status = "disabled";
+		};
+
+		wcnss_mem: wcnss {
+			size = <0x0 0x600000>;
+			alignment = <0x0 0x100000>;
+			alloc-ranges = <0x0 0x86800000 0x0 0x8000000>;
+			no-map;
+			status = "disabled";
+		};
+
+		venus_mem: venus {
+			size = <0x0 0x500000>;
+			alignment = <0x0 0x100000>;
+			alloc-ranges = <0x0 0x86800000 0x0 0x8000000>;
+			no-map;
+			status = "disabled";
+		};
+
+		mba_mem: mba {
+			size = <0x0 0x100000>;
+			alignment = <0x0 0x100000>;
+			alloc-ranges = <0x0 0x86800000 0x0 0x8000000>;
+			no-map;
+			status = "disabled";
+		};
+
+		gps_mem: gps {
+			size = <0x0 0x200000>;
+			alignment = <0x0 0x100000>;
+			alloc-ranges = <0x0 0x86800000 0x0 0x8000000>;
+			no-map;
+			status = "disabled";
+		};
 	};
 
 	smd {
@@ -570,7 +366,7 @@
 
 		rpm {
 			interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
-			qcom,ipc = <&apcs 8 0>;
+			qcom,ipc = <&apcs1_mbox 8 0>;
 			qcom,smd-edge = <15>;
 
 			rpm_requests: rpm-requests {
@@ -621,22 +417,13 @@
 		};
 	};
 
-	smem {
-		compatible = "qcom,smem";
-
-		memory-region = <&smem_mem>;
-		qcom,rpm-msg-ram = <&rpm_msg_ram>;
-
-		hwlocks = <&tcsr_mutex 3>;
-	};
-
 	smp2p-hexagon {
 		compatible = "qcom,smp2p";
 		qcom,smem = <435>, <428>;
 
 		interrupts = <GIC_SPI 27 IRQ_TYPE_EDGE_RISING>;
 
-		mboxes = <&apcs_mbox 14>;
+		mboxes = <&apcs1_mbox 14>;
 
 		qcom,local-pid = <0>;
 		qcom,remote-pid = <1>;
@@ -652,6 +439,8 @@
 
 			interrupt-controller;
 			#interrupt-cells = <2>;
+			#address-cells = <0>;
+			#size-cells = <0>;
 		};
 	};
 
@@ -661,7 +450,7 @@
 
 		interrupts = <GIC_SPI 143 IRQ_TYPE_EDGE_RISING>;
 
-		mboxes = <&apcs_mbox 18>;
+		mboxes = <&apcs1_mbox 18>;
 
 		qcom,local-pid = <0>;
 		qcom,remote-pid = <4>;
@@ -672,7 +461,7 @@
 			interrupt-controller;
 			#interrupt-cells = <2>;
 		};
-		
+
 		wcnss_smp2p_out: master-kernel {
 			qcom,entry-name = "master-kernel";
 
@@ -686,8 +475,8 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		qcom,ipc-1 = <&apcs 8 13>;
-		qcom,ipc-3 = <&apcs 8 19>;
+		qcom,ipc-1 = <&apcs1_mbox 8 13>;
+		qcom,ipc-3 = <&apcs1_mbox 8 19>;
 
 		apps_smsm: apps@0 {
 			reg = <0>;
@@ -713,10 +502,10 @@
 	};
 
 	soc: soc {
+		compatible = "simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges = <0 0 0 0xffffffff>;
-		compatible = "simple-bus";
 
 		rng@22000 {
 			compatible = "qcom,prng";
@@ -726,15 +515,114 @@
 		};
 
 		qfprom: qfprom@5c000 {
-			compatible = "qcom,qfprom";
+			compatible = "qcom,msm8916-qfprom", "qcom,qfprom";
 			reg = <0x0005c000 0x1000>;
 			#address-cells = <1>;
 			#size-cells = <1>;
-			tsens_caldata: caldata@d0 {
-				reg = <0xd0 0x8>;
+
+			tsens_base1: base1@a0 {
+				reg = <0xa0 0x1>;
+				bits = <0 8>;
 			};
-			tsens_calsel: calsel@ec {
-				reg = <0xec 0x4>;
+
+			tsens_s6_p1: s6-p1@a1 {
+				reg = <0xa1 0x1>;
+				bits = <0 6>;
+			};
+
+			tsens_s6_p2: s6-p2@a1 {
+				reg = <0xa1 0x2>;
+				bits = <6 6>;
+			};
+
+			tsens_s7_p1: s7-p1@a2 {
+				reg = <0xa2 0x2>;
+				bits = <4 6>;
+			};
+
+			tsens_s7_p2: s7-p2@a3 {
+				reg = <0xa3 0x1>;
+				bits = <2 6>;
+			};
+
+			tsens_s8_p1: s8-p1@a4 {
+				reg = <0xa4 0x1>;
+				bits = <0 6>;
+			};
+
+			tsens_s8_p2: s8-p2@a4 {
+				reg = <0xa4 0x2>;
+				bits = <6 6>;
+			};
+
+			tsens_s9_p1: s9-p1@a5 {
+				reg = <0xa5 0x2>;
+				bits = <4 6>;
+			};
+
+			tsens_s9_p2: s9-p2@a6 {
+				reg = <0xa6 0x1>;
+				bits = <2 6>;
+			};
+
+			tsens_base2: base2@a7 {
+				reg = <0xa7 0x1>;
+				bits = <0 8>;
+			};
+
+			tsens_mode: mode@d0 {
+				reg = <0xd0 0x1>;
+				bits = <0 3>;
+			};
+
+			tsens_s0_p1: s0-p1@d0 {
+				reg = <0xd0 0x2>;
+				bits = <3 6>;
+			};
+
+			tsens_s0_p2: s0-p1@d1 {
+				reg = <0xd1 0x1>;
+				bits = <1 6>;
+			};
+
+			tsens_s1_p1: s1-p1@d1 {
+				reg = <0xd1 0x2>;
+				bits = <7 6>;
+			};
+
+			tsens_s1_p2: s1-p2@d2 {
+				reg = <0xd2 0x2>;
+				bits = <5 6>;
+			};
+
+			tsens_s2_p1: s2-p1@d3 {
+				reg = <0xd3 0x2>;
+				bits = <3 6>;
+			};
+
+			tsens_s2_p2: s2-p2@d4 {
+				reg = <0xd4 0x1>;
+				bits = <1 6>;
+			};
+
+			tsens_s3_p1: s3-p1@d4 {
+				reg = <0xd4 0x2>;
+				bits = <7 6>;
+			};
+
+			tsens_s3_p2: s3-p2@d5 {
+				reg = <0xd5 0x2>;
+				bits = <5 6>;
+			};
+
+			tsens_s5_p1: s5-p1@d6 {
+				reg = <0xd6 0x2>;
+				bits = <3 6>;
+			};
+
+			tsens_s5_p2: s5-p2@d7 {
+				reg = <0xd7 0x1>;
+				bits = <1 6>;
 			};
 		};
 
@@ -753,12 +641,32 @@
 		};
 
 		tsens: thermal-sensor@4a9000 {
-			compatible = "qcom,msm8939-tsens";
+			compatible = "qcom,msm8939-tsens", "qcom,tsens-v0_1";
 			reg = <0x004a9000 0x1000>, /* TM */
 			      <0x004a8000 0x1000>; /* SROT */
-			nvmem-cells = <&tsens_caldata>, <&tsens_calsel>;
-			nvmem-cell-names = "calib", "calib_sel";
-			#qcom,sensors = <10>;
+			nvmem-cells = <&tsens_mode>,
+				      <&tsens_base1>, <&tsens_base2>,
+				      <&tsens_s0_p1>, <&tsens_s0_p2>,
+				      <&tsens_s1_p1>, <&tsens_s1_p2>,
+				      <&tsens_s2_p1>, <&tsens_s2_p2>,
+				      <&tsens_s3_p1>, <&tsens_s3_p2>,
+				      <&tsens_s5_p1>, <&tsens_s5_p2>,
+				      <&tsens_s6_p1>, <&tsens_s6_p2>,
+				      <&tsens_s7_p1>, <&tsens_s7_p2>,
+				      <&tsens_s8_p1>, <&tsens_s8_p2>,
+				      <&tsens_s9_p1>, <&tsens_s9_p2>;
+			nvmem-cell-names = "mode",
+					   "base1", "base2",
+					   "s0_p1", "s0_p2",
+					   "s1_p1", "s1_p2",
+					   "s2_p1", "s2_p2",
+					   "s3_p1", "s3_p2",
+					   "s5_p1", "s5_p2",
+					   "s6_p1", "s6_p2",
+					   "s7_p1", "s7_p2",
+					   "s8_p1", "s8_p2",
+					   "s9_p1", "s9_p2";
+			#qcom,sensors = <9>;
 			interrupts = <GIC_SPI 184 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "uplow";
 			#thermal-sensor-cells = <1>;
@@ -793,7 +701,6 @@
 					 <&rpmcc RPM_SMD_SYSMMNOC_A_CLK>;
 				#interconnect-cells = <1>;
 			};
-
 		};
 
 		tlmm: pinctrl@1000000 {
@@ -1382,11 +1289,6 @@
 
 				iommus = <&apps_iommu 4>;
 
-				interconnects = <&snoc_mm MASTER_MDP_PORT0 &bimc SLAVE_EBI_CH0>,
-						<&snoc_mm MASTER_MDP_PORT1 &bimc SLAVE_EBI_CH0>;
-				interconnect-names = "mdp0-mem", "mdp1-mem";
-
-
 				ports {
 					#address-cells = <1>;
 					#size-cells = <0>;
@@ -1738,7 +1640,7 @@
 				interrupts = <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
 
 				qcom,smd-edge = <0>;
-				mboxes = <&apcs_mbox 12>;
+				mboxes = <&apcs1_mbox 12>;
 				qcom,remote-pid = <1>;
 
 				label = "hexagon";
@@ -1854,28 +1756,32 @@
 			status = "disabled";
 		};
 
-		sdhc_1: sdhci@7824000 {
+		sdhc_1: sdhci@7824900 {
 			compatible = "qcom,msm8916-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0x07824900 0x11c>, <0x07824000 0x800>;
-			reg-names = "hc_mem", "core_mem";
+			reg-names = "hc", "core";
 
 			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "hc_irq", "pwr_irq";
-			clocks = <&gcc GCC_SDCC1_APPS_CLK>,
-				 <&gcc GCC_SDCC1_AHB_CLK>,
-				 <&xo_board>;
-			clock-names = "core", "iface", "xo";
-			mmc-hs200-1_8v;
+			clocks = <&gcc GCC_SDCC1_AHB_CLK>,
+				 <&gcc GCC_SDCC1_APPS_CLK>,
+				 <&rpmcc RPM_SMD_XO_CLK_SRC>;
+			clock-names = "iface", "core", "xo";
+			resets = <&gcc GCC_SDCC1_BCR>;
+			pinctrl-0 = <&sdc1_default>;
+			pinctrl-1 = <&sdc1_sleep>;
+			pinctrl-names = "default", "sleep";
+			mmc-ddr-1_8v;
 			bus-width = <8>;
 			non-removable;
 			status = "disabled";
 		};
 
-		sdhc_2: sdhci@7864000 {
+		sdhc_2: sdhci@7864900 {
 			compatible = "qcom,msm8916-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0x07864900 0x11c>, <0x07864000 0x800>;
-			reg-names = "hc_mem", "core_mem";
+			reg-names = "hc", "core";
 
 			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH>;
@@ -2144,28 +2050,31 @@
 			assigned-clock-rates = <80000000>;
 			resets = <&gcc GCC_USB_HS_BCR>;
 			reset-names = "core";
+			#reset-cells = <1>;
 			phy_type = "ulpi";
 			dr_mode = "otg";
+			adp-disable;
 			hnp-disable;
 			srp-disable;
-			adp-disable;
 			ahb-burst-config = <0>;
 			phy-names = "usb-phy";
 			phys = <&usb_hs_phy>;
 			status = "disabled";
-			#reset-cells = <1>;
 
 			ulpi {
 				usb_hs_phy: phy {
 					compatible = "qcom,usb-hs-phy-msm8916",
 						     "qcom,usb-hs-phy";
-					#phy-cells = <0>;
-					clocks = <&xo_board>, <&gcc GCC_USB2A_PHY_SLEEP_CLK>;
+					clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>,
+						 <&gcc GCC_USB2A_PHY_SLEEP_CLK>;
 					clock-names = "ref", "sleep";
 					resets = <&gcc GCC_USB2A_PHY_BCR>, <&usb 0>;
 					reset-names = "phy", "por";
-					qcom,init-seq = /bits/ 8 <0x0 0x44
-						0x1 0x6b 0x2 0x24 0x3 0x13>;
+					#phy-cells = <0>;
+					qcom,init-seq = /bits/ 8 <0x0 0x44>,
+								 <0x1 0x6b>,
+								 <0x2 0x24>,
+								 <0x3 0x13>;
 				};
 			};
 		};
@@ -2209,7 +2118,7 @@
 
 			smd-edge {
 				interrupts = <GIC_SPI 142 1>;
-				qcom,ipc = <&apcs 8 17>;
+				qcom,ipc = <&apcs1_mbox 8 17>;
 				qcom,smd-edge = <6>;
 				qcom,remote-pid = <4>;
 
@@ -2243,229 +2152,201 @@
 
 		intc: interrupt-controller@b000000 {
 			compatible = "qcom,msm-qgic2";
-			interrupt-controller;
-			#interrupt-cells = <3>;
 			reg = <0x0b000000 0x1000>, <0x0b002000 0x2000>,
 			      <0x0b001000 0x1000>, <0x0b004000 0x2000>;
-			interrupts = <GIC_PPI 0 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_HIGH)>;
+			interrupt-controller;
+			#interrupt-cells = <3>;
+			interrupts = <GIC_PPI 0 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_HIGH)>;
 		};
 
-		apcs_mbox: mailbox@b011000 {
-			compatible = "qcom,msm8916-apcs-kpss-global";
+		apcs1_mbox: mailbox@b011000 {
+			compatible = "qcom,msm8939-apcs-kpss-global", "syscon";
 			reg = <0x0b011000 0x1000>;
-			#mbox-cells = <1>;
-			clocks = <&a53pll>, <&gcc GPLL0_VOTE>, <&xo_board>;
+			clocks = <&a53pll_c1>, <&gcc GPLL0_VOTE>, <&rpmcc RPM_SMD_XO_CLK_SRC>;
 			clock-names = "pll", "aux", "ref";
 			#clock-cells = <0>;
+			assigned-clocks = <&apcs2>;
+			assigned-clock-rates = <297600000>;
+			#mbox-cells = <1>;
 		};
 
-		apcs: syscon@b011000 {
-			compatible = "syscon";
-			reg = <0xb011000 0x1000>;
-		};
-
-		a53pll: clock@b016000 {
+		a53pll_c1: clock@b016000 {
 			compatible = "qcom,msm8939-a53pll";
 			reg = <0x0b016000 0x40>;
 			#clock-cells = <0>;
-			clocks = <&xo_board>;
-			clock-names = "xo";
-			operating-points-v2 = <&a53pllc1_opp_table>;
 		};
 
-		apcs0: mailbox@b111000 {
-			compatible = "qcom,msm8916-apcs-kpss-global", "syscon";
-			reg = <0xb111000 0x1000>;
-			#mbox-cells = <1>;
-			clocks = <&a53pll_c0>, <&gcc GPLL0_VOTE>, <&xo_board>;
+		acc0: clock-controller@b088000 {
+			compatible = "qcom,kpss-acc-v2";
+			reg = <0x0b088000 0x1000>;
+		};
+
+		saw0: power-manager@b089000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
+			reg = <0x0b089000 0x1000>;
+		};
+
+		acc1: clock-controller@b098000 {
+			compatible = "qcom,kpss-acc-v2";
+			reg = <0x0b098000 0x1000>;
+		};
+
+		saw1: power-manager@b099000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
+			reg = <0x0b099000 0x1000>;
+		};
+
+		acc2: clock-controller@b0a8000 {
+			compatible = "qcom,kpss-acc-v2";
+			reg = <0x0b0a8000 0x1000>;
+		};
+
+		saw2: power-manager@b0a9000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
+			reg = <0x0b0a9000 0x1000>;
+		};
+
+		acc3: clock-controller@b0b8000 {
+			compatible = "qcom,kpss-acc-v2";
+			reg = <0x0b0b8000 0x1000>;
+		};
+
+		saw3: power-manager@b0b9000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
+			reg = <0x0b0b9000 0x1000>;
+		};
+
+		apcs0_mbox: mailbox@b111000 {
+			compatible = "qcom,msm8939-apcs-kpss-global", "syscon";
+			reg = <0x0b111000 0x1000>;
+			clocks = <&a53pll_c0>, <&gcc GPLL0_VOTE>, <&rpmcc RPM_SMD_XO_CLK_SRC>;
 			clock-names = "pll", "aux", "ref";
 			#clock-cells = <0>;
+			#mbox-cells = <1>;
 		};
 
 		a53pll_c0: clock@b116000 {
 			compatible = "qcom,msm8939-a53pll";
-			reg = <0xb116000 0x40>;
-			#clock-cells = <0>;
-			clocks = <&xo_board>;
-			clock-names = "xo";
-			operating-points-v2 = <&a53pllc0_opp_table>;
-		};
-
-		a53pll_cci: clock@b1d0000 {
-			compatible = "qcom,msm8939-a53pll";
-			reg = <0xb1d0000 0x40>;
-			#clock-cells = <0>;
-			clocks = <&xo_board>;
-			clock-names = "xo";
-			operating-points-v2 = <&a53pllcci_opp_table>;
-		};
-
-		apcs2: mailbox@b1d1000 {
-			compatible = "qcom,msm8916-apcs-kpss-global", "syscon";
-			reg = <0xb1d1000 0x1000>;
-			#mbox-cells = <1>;
-			clocks = <&a53pll_cci>, <&gcc GPLL0_VOTE>, <&xo_board>;
-			clock-names = "pll", "aux", "ref";
+			reg = <0x0b116000 0x40>;
 			#clock-cells = <0>;
 		};
 
 		timer@b120000 {
+			compatible = "arm,armv7-timer-mem";
+			reg = <0x0b120000 0x1000>;
 			#address-cells = <1>;
 			#size-cells = <1>;
 			ranges;
-			compatible = "arm,armv7-timer-mem";
-			reg = <0x0b120000 0x1000>;
 			clock-frequency = <19200000>;
 
 			frame@b121000 {
-				frame-number = <0>;
-				interrupts = <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>,
-					     <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b121000 0x1000>,
 				      <0x0b122000 0x1000>;
+				interrupts = <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <0>;
 			};
 
 			frame@b123000 {
-				frame-number = <1>;
-				interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b123000 0x1000>;
+				interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <1>;
 				status = "disabled";
 			};
 
 			frame@b124000 {
-				frame-number = <2>;
-				interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b124000 0x1000>;
+				interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <2>;
 				status = "disabled";
 			};
 
 			frame@b125000 {
-				frame-number = <3>;
-				interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b125000 0x1000>;
+				interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <3>;
 				status = "disabled";
 			};
 
 			frame@b126000 {
-				frame-number = <4>;
-				interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b126000 0x1000>;
+				interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <4>;
 				status = "disabled";
 			};
 
 			frame@b127000 {
-				frame-number = <5>;
-				interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b127000 0x1000>;
+				interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <5>;
 				status = "disabled";
 			};
 
 			frame@b128000 {
-				frame-number = <6>;
-				interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
 				reg = <0x0b128000 0x1000>;
+				interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
+				frame-number = <6>;
 				status = "disabled";
 			};
 		};
 
-		cpu0_acc: power-manager@b088000 {
-			compatible = "qcom,msm8916-acc";
-			reg = <0x0b088000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu0_saw: power-manager@b089000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
-			reg = <0x0b089000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu1_acc: power-manager@b098000 {
-			compatible = "qcom,msm8916-acc";
-			reg = <0x0b098000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu1_saw: power-manager@b099000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
-			reg = <0x0b099000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu2_acc: power-manager@b0a8000 {
-			compatible = "qcom,msm8916-acc";
-			reg = <0x0b0a8000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu2_saw: power-manager@b0a9000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
-			reg = <0x0b0a9000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu3_acc: power-manager@b0b8000 {
-			compatible = "qcom,msm8916-acc";
-			reg = <0x0b0b8000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu3_saw: power-manager@b0b9000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
-			reg = <0x0b0b9000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
-		};
-
-		cpu4_acc: power-manager@b188000 {
-			compatible = "qcom,msm8916-acc";
+		acc4: clock-controller@b188000 {
+			compatible = "qcom,kpss-acc-v2";
 			reg = <0x0b188000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu4_saw: power-manager@b189000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
+		saw4: power-manager@b189000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
 			reg = <0x0b189000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu5_acc: power-manager@b198000 {
-			compatible = "qcom,msm8916-acc";
+		acc5: clock-controller@b198000 {
+			compatible = "qcom,kpss-acc-v2";
 			reg = <0x0b198000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu5_saw: power-manager@b199000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
+		saw5: power-manager@b199000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
 			reg = <0x0b199000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu6_acc: power-manager@b1a8000 {
-			compatible = "qcom,msm8916-acc";
+		acc6: clock-controller@b1a8000 {
+			compatible = "qcom,kpss-acc-v2";
 			reg = <0x0b1a8000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu6_saw: power-manager@b1a9000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
+		saw6: power-manager@b1a9000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
 			reg = <0x0b1a9000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu7_acc: power-manager@b1b8000 {
-			compatible = "qcom,msm8916-acc";
+		acc7: clock-controller@b1b8000 {
+			compatible = "qcom,kpss-acc-v2";
 			reg = <0x0b1b8000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
 		};
 
-		cpu7_saw: power-manager@b1b9000 {
-			compatible = "qcom,msm8916-saw2-v3.0-cpu", "qcom,saw2";
+		saw7: power-manager@b1b9000 {
+			compatible = "qcom,msm8939-saw2-v3.0-cpu", "qcom,saw2";
 			reg = <0x0b1b9000 0x1000>;
-			status = "reserved"; /* Controlled by PSCI firmware */
+		};
+
+		a53pll_cci: clock@b1d0000 {
+			compatible = "qcom,msm8939-a53pll";
+			reg = <0x0b1d0000 0x40>;
+			#clock-cells = <0>;
+		};
+
+		apcs2: mailbox@b1d1000 {
+			compatible = "qcom,msm8939-apcs-kpss-global", "syscon";
+			reg = <0x0b1d1000 0x1000>;
+			clocks = <&a53pll_cci>, <&gcc GPLL0_VOTE>, <&rpmcc RPM_SMD_XO_CLK_SRC>;
+			clock-names = "pll", "aux", "ref";
+			#clock-cells = <0>;
+			#mbox-cells = <1>;
 		};
 	};
 
-	thermal-zones {
+	thermal_zones: thermal-zones {
 		cpu0-thermal {
 			polling-delay-passive = <250>;
 			polling-delay = <1000>;
@@ -2480,8 +2361,8 @@
 				};
 
 				cpu0_crit: trip1 {
-					temperature = <110000>;
-					hysteresis = <2000>;
+					temperature = <115000>;
+					hysteresis = <0>;
 					type = "critical";
 				};
 			};
@@ -2641,14 +2522,59 @@
 				};
 			};
 		};
-	};
 
+		modem1-thermal {
+			polling-delay-passive = <250>;
+			polling-delay = <1000>;
+
+			thermal-sensors = <&tsens 0>;
+
+			trips {
+				modem1_alert0: trip-point0 {
+					temperature = <85000>;
+					hysteresis = <2000>;
+					type = "hot";
+				};
+			};
+		};
+
+		modem2-thermal {
+			polling-delay-passive = <250>;
+			polling-delay = <1000>;
+
+			thermal-sensors = <&tsens 2>;
+
+			trips {
+				modem2_alert0: trip-point0 {
+					temperature = <85000>;
+					hysteresis = <2000>;
+					type = "hot";
+				};
+			};
+		};
+
+		camera-thermal {
+			polling-delay-passive = <250>;
+			polling-delay = <1000>;
+
+			thermal-sensors = <&tsens 1>;
+
+			trips {
+				cam_alert0: trip-point0 {
+					temperature = <75000>;
+					hysteresis = <2000>;
+					type = "hot";
+				};
+			};
+		};
+	};
 
 	timer {
 		compatible = "arm,armv8-timer";
-		interrupts = <GIC_PPI 2 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
-			     <GIC_PPI 3 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
-			     <GIC_PPI 4 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
-			     <GIC_PPI 1 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>;
+		interrupts = <GIC_PPI 2 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 3 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 4 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 1 (GIC_CPU_MASK_SIMPLE(8) | IRQ_TYPE_LEVEL_LOW)>;
 	};
 };
+
