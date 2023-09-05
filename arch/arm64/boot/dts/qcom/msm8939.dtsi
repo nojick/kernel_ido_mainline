@@ -148,6 +148,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs_mbox>;
 			//operating-points-v2 = <&cpu_opp_table>;
+			//qcom,acc = <&acc0>;
+			//qcom,saw = <&saw0>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu0_acc>;
 			qcom,saw = <&cpu0_saw>;
@@ -162,6 +164,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs_mbox>;
 			//operating-points-v2 = <&cpu_opp_table>;
+			//qcom,acc = <&acc1>;
+			//qcom,saw = <&saw1>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu1_acc>;
 			qcom,saw = <&cpu1_saw>;
@@ -175,6 +179,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs_mbox>;
 			//operating-points-v2 = <&cpu_opp_table>;
+			//qcom,acc = <&acc2>;
+			//qcom,saw = <&saw2>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu2_acc>;
 			qcom,saw = <&cpu2_saw>;
@@ -188,6 +194,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs_mbox>;
 			//operating-points-v2 = <&cpu_opp_table>;
+			//qcom,acc = <&acc3>;
+			//qcom,saw = <&saw3>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu3_acc>;
 			qcom,saw = <&cpu3_saw>;
@@ -201,6 +209,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs0>;
 			//operating-points-v2 = <&cpu_opp_table_little>;
+			//qcom,acc = <&acc4>;
+			//qcom,saw = <&saw4>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu4_acc>;
 			qcom,saw = <&cpu4_saw>;
@@ -214,6 +224,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs0>;
 			//operating-points-v2 = <&cpu_opp_table_little>;
+			//qcom,acc = <&acc5>;
+			//qcom,saw = <&saw5>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu5_acc>;
 			qcom,saw = <&cpu5_saw>;
@@ -227,6 +239,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs0>;
 			//operating-points-v2 = <&cpu_opp_table_little>;
+			//qcom,acc = <&acc6>;
+			//qcom,saw = <&saw6>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu6_acc>;
 			qcom,saw = <&cpu6_saw>;
@@ -240,6 +254,8 @@
 			enable-method = "spin-table";
 			clocks = <&apcs0>;
 			//operating-points-v2 = <&cpu_opp_table_little>;
+			//qcom,acc = <&acc7>;
+			//qcom,saw = <&saw7>;
 			#cooling-cells = <2>;
 			qcom,acc = <&cpu7_acc>;
 			qcom,saw = <&cpu7_saw>;
