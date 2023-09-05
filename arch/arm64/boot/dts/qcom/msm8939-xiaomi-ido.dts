@@ -172,6 +172,75 @@ ramoops@xdfe00000 {
 			regulator-active-discharge = <1>;
 		};
 	};
+
+	bma253@18 {
+		compatible = "bosch,bma253";
+		reg = <0x18>;
+		pinctrl-names = "default","sleep";
+		pinctrl-0 = <&bma2x2_int1_default &bma2x2_int2_default>;
+		pinctrl-1 = <&bma2x2_int1_sleep &bma2x2_int2_sleep>;
+		vdd-supply = <&pm8916_l17>;
+		vddio-supply = <&pm8916_l6>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <112 IRQ_TYPE_EDGE_RISING>;
+		mount-matrix = "0", "1", "0",
+				"-1", "0", "0",
+				"0", "0", "1";
+        };
+   
+        light-sensor@23 {
+		compatible = "liteon,ltr559";
+		reg = <0x23>;
+
+		vdd-supply = <&pm8916_l17>;
+		vddio-supply = <&pm8916_l6>;
+		proximity-near-level = <75>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <113 IRQ_TYPE_EDGE_FALLING>;
+
+		pinctrl-0 = <&alsps_default>;
+		pinctrl-1 = <&alsps_sleep>;
+		pinctrl-names = "default","sleep";
+	};
+
+	akm@c {
+		compatible = "asahi-kasei,ak09911";
+		reg = <0x0c>;
+
+		vdd-supply = <&pm8916_l17>;
+		vid-supply = <&pm8916_l6>;
+		mount-matrix = "0", "1", "0",
+			      "-1", "0", "0",
+			       "0", "0", "1";
+	};
+	
+	yamaha@2e {
+		compatible = "yamaha,yas537";
+		reg = <0x2e>;
+		vdd-supply = <&pm8916_l17>;
+		iovdd-supply = <&pm8916_l6>;
+		mount-matrix =  "1",  "0",  "0",
+				"1",  "0",  "0",
+				"0",  "0", "-1";
+	};
+	
+	mpu6050: mpu6050@68 {
+		compatible = "invensense,mpu6050";
+		reg = <0x68>;
+
+		interrupt-parent = <&tlmm>;
+		interrupts = <64 IRQ_TYPE_EDGE_RISING>;
+		mount-matrix = "0", "1", "0",
+			       "1", "0", "0",
+			       "0", "0", "1";
+		vdd-supply = <&pm8916_l17>;
+		vddio-supply = <&pm8916_l6>;
+		pinctrl-0 = <&mpu6050_default>;
+		pinctrl-1 = <&mpu6050_sleep>;
+		pinctrl-names = "default","sleep";
+	};
+
 };
 
 &blsp_i2c4 {
@@ -516,6 +585,74 @@ smb_int_default: smb-int-default-state {
 		};
 		mdss_sleep: mdss-sleep {
 			pins = "gpio25";
+			function = "gpio";
+
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+    bma2x2_int1_pin {
+		bma2x2_int1_default: int1_default {
+			pins = "gpio112";
+			function = "gpio";
+
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+		bma2x2_int1_sleep: int1_sleep {
+			pins = "gpio112";
+			function = "gpio";
+
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	bma2x2_int2_pin {
+		bma2x2_int2_default: int2_default {
+			pins = "gpio114";
+			function = "gpio";
+
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+		bma2x2_int2_sleep: int2_sleep {
+			pins = "gpio114";
+			function = "gpio";
+
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+    ltr559_int_pin {
+		alsps_default: alsps_default {
+			pins = "gpio113";
+			function = "gpio";
+
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+		alsps_sleep: alsps_sleep {
+			pins = "gpio113";
+			function = "gpio";
+
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+};
+
+    mpu6050_int_pin {
+		mpu6050_default: mpu6050_default {
+			pins = "gpio115";
+			function = "gpio";
+
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+		mpu6050_sleep: mpu6050_sleep {
+			pins = "gpio115";
 			function = "gpio";
 
 			drive-strength = <2>;
