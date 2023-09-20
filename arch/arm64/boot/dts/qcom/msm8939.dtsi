@@ -2530,6 +2530,7 @@
 			compatible = "qcom,msm8939-a53pll";
 			reg = <0x0b116000 0x40>;
 			#clock-cells = <0>;
+			operating-points-v2 = <&a53pllc0_opp_table>;
 		};
 
 		timer@b120000 {
@@ -2635,6 +2636,7 @@
 			compatible = "qcom,msm8939-a53pll";
 			reg = <0x0b1d0000 0x40>;
 			#clock-cells = <0>;
+			operating-points-v2 = <&a53pllcci_opp_table>;
 		};
 
 		apcs2: mailbox@b1d1000 {
