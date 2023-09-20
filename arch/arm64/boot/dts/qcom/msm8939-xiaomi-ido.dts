@@ -444,6 +444,14 @@ ports {
 	status = "okay";
 };
 
+&wcnss_mem {
+	status = "okay";
+};
+
+&wcnss_iris {
+	compatible = "qcom,wcn3620";
+};
+
 &sdhc_1 {
 	status = "okay";
 };
