@@ -1,6 +1,6 @@
 CONFIG_LOCALVERSION="-msm8939"
 CONFIG_FW_LOADER=y
-CONFIG_EXTRA_FIRMWARE="a420_pfp.fw a420_pm4.fw regulatory.db regulatory.db.p7s wcnss.b00 wcnss.b01 wcnss.b02 wcnss.b04 wcnss.b06 wcnss.b09 wcnss.b10 wcnss.b11 wcnss.mdt"	
+CONFIG_EXTRA_FIRMWARE="a420_pfp.fw a420_pm4.fw regulatory.db regulatory.db.p7s"	
 CONFIG_EXTRA_FIRMWARE_DIR="qcom"
 CONFIG_ZRAM=y
 CONFIG_CRYPTO_LZ4=y
