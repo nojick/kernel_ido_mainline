@@ -470,48 +470,6 @@ ports {
 	cd-gpios = <&tlmm 38 GPIO_ACTIVE_HIGH>;
 };
 
-/*
-&lpass {
-	status = "okay";
-};
-
-&sound {
-	status = "okay";
-
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&cdc_pdm_default>;
-	pinctrl-1 = <&cdc_pdm_sleep>;
-
-	model = "msm8939-snd-card-skuk";
-	qcom,model = "msm8939-snd-card-skuk";
-	audio-routing =
-		"RX_BIAS","MCLK",
-		"SPK_RX_BIAS","MCLK",
-		"INT_LDO_H","MCLK",
-		"MIC BIAS External","Handset Mic",
-		"MIC BIAS Internal2","Headset Mic",
-		"MIC BIAS External","Secondary Mic",
-		"AMIC1","MIC BIAS External",
-		"AMIC2","MIC BIAS Internal2",
-		"AMIC3","MIC BIAS External";
-
-	internal-dai-link@0 {
-		cpu { 
-			sound-dai = <&lpass MI2S_PRIMARY>;
-		};
-		codec {
-			sound-dai = <&lpass_codec 0>, <&pm8916_codec 0>;
-		};
-	};
-};
-
-&pm8916_codec {
-	qcom,micbias-lvl = <2800>;
-	qcom,mbhc-vthreshold-low = <75 100 120 180 500>;
-	qcom,mbhc-vthreshold-high = <75 100 120 180 500>;
-	qcom,hphl-jack-type-normally-open;
-};
-*/
 &usb {
 	status = "okay";
 	extcon = <&usb_id>, <&usb_id>;
