@@ -370,7 +370,7 @@ ramoops@xdfe00000 {
 		};
 	};
 };
-/*
+
 &mdss_dsi0 {
 	status = "okay";
 	vdda-supply = <&pm8916_l2>;
@@ -401,8 +401,6 @@ ports {
 		};
 	};
 };
-*/
-/*
 &mdss_dsi0_out {
 	data-lanes = <0 1 2 3>;
 	remote-endpoint = <&panel_in>;
