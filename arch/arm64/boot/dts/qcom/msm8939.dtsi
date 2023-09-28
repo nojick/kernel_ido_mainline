@@ -43,15 +43,138 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+		CPU0: cpu@100 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x100>;
+			next-level-cache = <&L2_1>;
+			//qcom,acc = <&acc0>;
+			//qcom,saw = <&saw0>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
+			#cooling-cells = <2>;
+			L2_1: l2-cache {
+				compatible = "cache";
+				cache-level = <2>;
+			};
+		};
+
+		CPU1: cpu@101 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x101>;
+			next-level-cache = <&L2_1>;
+			//qcom,acc = <&acc1>;
+			//qcom,saw = <&saw1>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
+			#cooling-cells = <2>;
+		};
+
+		CPU2: cpu@102 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x102>;
+			next-level-cache = <&L2_1>;
+			//qcom,acc = <&acc2>;
+			//qcom,saw = <&saw2>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
+			#cooling-cells = <2>;
+		};
+
+		CPU3: cpu@103 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x103>;
+			next-level-cache = <&L2_1>;
+			//qcom,acc = <&acc3>;
+			//qcom,saw = <&saw3>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs1_mbox>;
+			#cooling-cells = <2>;
+		};
+
+		CPU4: cpu@0 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x0>;
+			//qcom,acc = <&acc4>;
+			//qcom,saw = <&saw4>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
+			#cooling-cells = <2>;
+			next-level-cache = <&L2_0>;
+			L2_0: l2-cache {
+				compatible = "cache";
+				cache-level = <2>;
+			};
+		};
+
+		CPU5: cpu@1 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x1>;
+			next-level-cache = <&L2_0>;
+			//qcom,acc = <&acc5>;
+			//qcom,saw = <&saw5>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
+			#cooling-cells = <2>;
+		};
+
+		CPU6: cpu@2 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x2>;
+			next-level-cache = <&L2_0>;
+			//qcom,acc = <&acc6>;
+			//qcom,saw = <&saw6>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
+			#cooling-cells = <2>;
+		};
+
+		CPU7: cpu@3 {
+			compatible = "arm,cortex-a53";
+			device_type = "cpu";
+			enable-method = "spin-table";
+			reg = <0x3>;
+			next-level-cache = <&L2_0>;
+			//qcom,acc = <&acc7>;
+			//qcom,saw = <&saw7>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
+			clocks = <&apcs0_mbox>;
+			#cooling-cells = <2>;
+		};
+
+		idle-states {
+			CPU_SLEEP_0: cpu-sleep-0 {
+				compatible ="qcom,idle-state-spc", "arm,idle-state";
+				entry-latency-us = <130>;
+				exit-latency-us = <150>;
+				min-residency-us = <2000>;
+				local-timer-stop;
+			};
+		};
+	};
+
 	/*
 	 * MSM8939 has a big.LITTLE heterogeneous computing architecture,
 	 * consisting of two clusters of four ARM Cortex-A53s each. The
 	 * LITTLE cluster runs at 1.0-1.2GHz, and the big cluster runs
 	 * at 1.5-1.7GHz.
 	 *
-	 * The enable method used here is psci which presupposes use
+	 * The enable method used here is spin-table which presupposes use
 	 * of a 2nd stage boot shim such as lk2nd to have installed a
-	 * psci, the downstream non-psci/non-psci method that
+	 * spin-table, the downstream non-psci/non-spin-table method that
 	 * default msm8916/msm8936/msm8939 will not be supported upstream.
 	 */
 	cpu-map {
@@ -77,442 +200,23 @@
 		/* big (performance) cluster */
 		/* Boot CPU is cluster 1 core 0 */
 		cluster1 {
-			core4 {
+			core0 {
 				cpu = <&CPU0>;
 			};
 
-			core5 {
+			core1 {
 				cpu = <&CPU1>;
 			};
 
-			core6 {
+			core2 {
 				cpu = <&CPU2>;
 			};
 
-			core7 {
+			core3 {
 				cpu = <&CPU3>;
 			};
 		};
 	};
-
-
-		CPU0: cpu@0 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x100>;
-			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc0>;
-			qcom,saw = <&saw0>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs1_mbox>;
-			operating-points-v2 = <&cpu_opp_table>;
-			power-domains = <&CPU_PD0>;
-			//power-domain-names = "psci";
-			#cooling-cells = <2>;
-			L2_1: l2-cache {
-				compatible = "cache";
-				cache-unified;
-				cache-level = <2>;
-			};
-		};
-
-		CPU1: cpu@1 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x101>;
-			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc1>;
-			qcom,saw = <&saw1>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs1_mbox>;
-			operating-points-v2 = <&cpu_opp_table>;
-			power-domains = <&CPU_PD1>;
-			//power-domain-names = "psci";
-			#cooling-cells = <2>;
-		};
-
-		CPU2: cpu@2 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x102>;
-			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc2>;
-			qcom,saw = <&saw2>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs1_mbox>;
-			operating-points-v2 = <&cpu_opp_table>;
-			power-domains = <&CPU_PD2>;
-			//power-domain-names = "psci";
-			#cooling-cells = <2>;
-		};
-
-		CPU3: cpu@3 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x103>;
-			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc3>;
-			qcom,saw = <&saw3>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs1_mbox>;
-			operating-points-v2 = <&cpu_opp_table>;
-			power-domains = <&CPU_PD3>;
-			//power-domain-names = "psci";
-			#cooling-cells = <2>;
-		};
-
-		CPU4: cpu@4 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x0>;
-			qcom,acc = <&acc4>;
-			qcom,saw = <&saw4>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs0_mbox>;
-			operating-points-v2 = <&cpu_opp_table_little>;
-			//power-domains = <&CPU_PD4>;
-			#cooling-cells = <2>;
-			next-level-cache = <&L2_0>;
-			L2_0: l2-cache1 {
-				compatible = "cache";
-				cache-unified;
-				cache-level = <2>;
-			};
-		};
-
-		CPU5: cpu@5 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x1>;
-			next-level-cache = <&L2_0>;
-			qcom,acc = <&acc5>;
-			qcom,saw = <&saw5>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs0_mbox>;
-			operating-points-v2 = <&cpu_opp_table_little>;
-			//power-domains = <&CPU_PD5>;
-			#cooling-cells = <2>;
-		};
-
-		CPU6: cpu@6 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x2>;
-			next-level-cache = <&L2_0>;
-			qcom,acc = <&acc6>;
-			qcom,saw = <&saw6>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs0_mbox>;
-			operating-points-v2 = <&cpu_opp_table_little>;
-			//power-domains = <&CPU_PD6>;
-			#cooling-cells = <2>;
-		};
-
-		CPU7: cpu@7 {
-			compatible = "arm,cortex-a53";
-			device_type = "cpu";
-			enable-method = "psci";
-			reg = <0x3>;
-			next-level-cache = <&L2_0>;
-			qcom,acc = <&acc7>;
-			qcom,saw = <&saw7>;
-			cpu-idle-states = <&CPU_SLEEP_0>;
-			clocks = <&apcs0_mbox>;
-			operating-points-v2 = <&cpu_opp_table_little>;
-			//power-domains = <&CPU_PD7>;
-			#cooling-cells = <2>;
-		};
-
-		idle-states {
-			entry-method = "psci";
-
-			CPU_SLEEP_0: cpu-sleep-0 {
-				compatible = "arm,idle-state";
-				arm,psci-suspend-param = <0x40000002>;
-				entry-latency-us = <130>;
-				exit-latency-us = <150>;
-				min-residency-us = <2000>;
-				local-timer-stop;
-			};
-		};
-
-		domain-idle-states {
-
-			CLUSTER_RET: cluster0-retention {
-				compatible = "domain-idle-state";
-				arm,psci-suspend-param = <0x41000012>;
-				entry-latency-us = <360>;
-				exit-latency-us = <267>;
-				min-residency-us = <967>;
-			};
-
-			CLUSTER_PWRDN: cluster0-gdhs {
-				compatible = "domain-idle-state";
-				arm,psci-suspend-param = <0x41000032>;
-				entry-latency-us = <574>;
-				exit-latency-us = <305>;
-				min-residency-us = <3118>;
-			};
-		};
-	};
-
-	cpu_opp_table: cpu-opp-table {
-		compatible = "operating-points-v2";
-		opp-shared;
-
-		opp-200000000 {
-			opp-hz = /bits/ 64 <200000000>;
-		};
-		opp-345600000 {
-			opp-hz = /bits/ 64 <345600000>;
-		};
-		opp-400000000 {
-			opp-hz = /bits/ 64 <400000000>;
-		};
-		opp-533330000 {
-			opp-hz = /bits/ 64 <533330000>;
-		};
-		opp-800000000 {
-			opp-hz = /bits/ 64 <800000000>;
-		};
-		opp-960000000 {
-			opp-hz = /bits/ 64 <960000000>;
-		};
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-		opp-1344000000 {
-			opp-hz = /bits/ 64 <1344000000>;
-		};
-		opp-1459200000 {
-			opp-hz = /bits/ 64 <1459200000>;
-		};
-		opp-1497600000 {
-			opp-hz = /bits/ 64 <1497600000>;
-		};
-		/*
-		opp-1651200000 {
-			opp-hz = /bits/ 64 <1651200000>;
-		};
-		*/
-	};
-
-	cpu_opp_table_little: cpu-opp-table-little {
-		compatible = "operating-points-v2";
-		opp-shared;
-
-		opp-200000000 {
-			opp-hz = /bits/ 64 <200000000>;
-		};
-		opp-249600000 {
-			opp-hz = /bits/ 64 <249600000>;
-		};
-		opp-499200000 {
-			opp-hz = /bits/ 64 <499200000>;
-		};
-		opp-800000000 {
-			opp-hz = /bits/ 64 <800000000>;
-		};
-		
-		opp-998400000 {
-			opp-hz = /bits/ 64 <998400000>;
-		};
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-	};
-
-	a53pllc0_opp_table: a53pllc0-opp-table {
-		compatible = "operating-points-v2";
-
-		opp-998400000 {
-			opp-hz = /bits/ 64 <998400000>;
-		};
-
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-
-		opp-1209600000 {
-			opp-hz = /bits/ 64 <1209600000>;
-		};
-	};
-
-	a53pllc1_opp_table: a53pllc1-opp-table {
-		compatible = "operating-points-v2";
-
-		opp-652800000 {
-			opp-hz = /bits/ 64 <652800000>;
-		};
-
-		opp-691200000 {
-			opp-hz = /bits/ 64 <691200000>;
-		};
-
-		opp-729600000 {
-			opp-hz = /bits/ 64 <729600000>;
-		};
-
-		opp-806400000 {
-			opp-hz = /bits/ 64 <806400000>;
-		};
-
-		opp-844800000 {
-			opp-hz = /bits/ 64 <844800000>;
-		};
-
-		opp-883200000 {
-			opp-hz = /bits/ 64 <883200000>;
-		};
-
-		opp-960000000 {
-			opp-hz = /bits/ 64 <960000000>;
-		};
-
-		opp-998400000 {
-			opp-hz = /bits/ 64 <998400000>;
-		};
-
-		opp-1036800000 {
-			opp-hz = /bits/ 64 <1036800000>;
-		};
-
-		opp-1113600000 {
-			opp-hz = /bits/ 64 <1113600000>;
-		};
-
-		opp-1190400000 {
-			opp-hz = /bits/ 64 <1190400000>;
-		};
-
-		opp-1209600000 {
-			opp-hz = /bits/ 64 <1209600000>;
-		};
-
-		opp-1267200000 {
-			opp-hz = /bits/ 64 <1267200000>;
-		};
-
-		opp-1344000000 {
-			opp-hz = /bits/ 64 <1344000000>;
-		};
-
-		opp-1363200000 {
-			opp-hz = /bits/ 64 <1363200000>;
-		};
-
-		opp-1420800000 {
-			opp-hz = /bits/ 64 <1420800000>;
-		};
-
-		opp-1459200000 {
-			opp-hz = /bits/ 64 <1459200000>;
-		};
-
-		opp-1497600000 {
-			opp-hz = /bits/ 64 <1497600000>;
-		};
-
-		opp-1536000000 {
-			opp-hz = /bits/ 64 <1536000000>;
-		};
-
-		opp-1574400000 {
-			opp-hz = /bits/ 64 <1574400000>;
-		};
-
-		opp-1612800000 {
-			opp-hz = /bits/ 64 <1612800000>;
-		};
-
-		opp-1632000000 {
-			opp-hz = /bits/ 64 <1632000000>;
-		};
-
-		opp-1651200000 {
-			opp-hz = /bits/ 64 <1651200000>;
-		};
-
-		opp-1689600000 {
-			opp-hz = /bits/ 64 <1689600000>;
-		};
-
-		opp-1708800000 {
-			opp-hz = /bits/ 64 <1708800000>;
-		};
-	};
-
-	a53pllcci_opp_table: a53pllcci-opp-table {
-		compatible = "operating-points-v2";
-		opp-307200000 { opp-hz = /bits/ 64 <307200000>; };
-		opp-600000000 { opp-hz = /bits/ 64 <600000000>; };
-	};
-
-	psci {
-		compatible = "arm,psci-1.0";
-		method = "smc";
-
-		CPU_PD0: power-domain-cpu0 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD1: power-domain-cpu1 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD2: power-domain-cpu2 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD3: power-domain-cpu3 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD4: power-domain-cpu4 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD5: power-domain-cpu5 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD6: power-domain-cpu6 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CPU_PD7: power-domain-cpu7 {
-			#power-domain-cells = <0>;
-			power-domains = <&CLUSTER_PD>;
-			domain-idle-states = <&CPU_SLEEP_0>;
-		};
-
-		CLUSTER_PD: power0-domain-cluster {
-			#power-domain-cells = <0>;
-			domain-idle-states = <&CLUSTER_RET>, <&CLUSTER_PWRDN>;
-		};
-	};
-
 
 	firmware {
 		scm: scm {
@@ -2474,7 +2178,6 @@
 			compatible = "qcom,msm8939-a53pll";
 			reg = <0x0b016000 0x40>;
 			#clock-cells = <0>;
-			operating-points-v2 = <&a53pllc1_opp_table>;
 		};
 
 		acc0: clock-controller@b088000 {
