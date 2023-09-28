@@ -91,6 +91,7 @@ enum {
 	FAN53555_CHIP_ID_04,
 	FAN53555_CHIP_ID_05,
 	FAN53555_CHIP_ID_08 = 8,
+	FAN53555_CHIP_ID_12 = 12,
 };
 
 enum {
@@ -113,6 +114,7 @@ enum {
 enum {
 	FAN53555_CHIP_REV_00 = 0x3,
 	FAN53555_CHIP_REV_13 = 0xf,
+	FAN53555_CHIP_REV_12 = 0xc,
 };
 
 enum {
@@ -297,6 +299,10 @@ static int fan53555_voltages_setup_fairchild(struct fan53555_device_info *di)
 			di->vsel_min = 600000;
 			di->vsel_step = 10000;
 			break;
+		case FAN53555_CHIP_REV_12:
+			di->vsel_min = 600000;
+			di->vsel_step = 12500;
+			break;
 		case FAN53555_CHIP_REV_13:
 			di->vsel_min = 800000;
 			di->vsel_step = 10000;
@@ -308,13 +314,14 @@ static int fan53555_voltages_setup_fairchild(struct fan53555_device_info *di)
 			return -EINVAL;
 		}
 		break;
+	case FAN53555_CHIP_ID_12:
+		di->vsel_min = 600000;
+		di->vsel_step = 12500;
+		break;
 	case FAN53555_CHIP_ID_01:
 	case FAN53555_CHIP_ID_03:
 	case FAN53555_CHIP_ID_05:
 	case FAN53555_CHIP_ID_08:
-		di->vsel_min = 600000;
-		di->vsel_step = 10000;
-		break;
 	case FAN53555_CHIP_ID_04:
 		di->vsel_min = 603000;
 		di->vsel_step = 12826;

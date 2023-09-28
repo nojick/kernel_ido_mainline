@@ -247,6 +247,20 @@ ramoops@xdfe00000 {
 
 	status = "okay";
 
+        regulator@60 {
+            compatible = "fcs,fan53555";
+            reg = <0x60>;
+            regulator-name = "fan53555";
+            pinctrl-names = "default";
+	    pinctrl-0 = <&ext_buck_vsel_default>;
+            regulator-min-microvolt = <1050000>;
+            regulator-max-microvolt = <1350000>;
+            enable-gpios = <&tlmm 111 GPIO_ACTIVE_HIGH>;
+            regulator-boot-on;
+	    regulator-always-on;
+        };
+
+
 	power_supply: charger@57 {
 		compatible = "summit,smb358";
 		reg = <0x57>;
@@ -527,6 +541,14 @@ ports {
 &tlmm {
 	usb_id_default: usb-id-default {
 		pins = "gpio110";
+		function = "gpio";
+
+		drive-strength = <8>;
+		bias-pull-up;
+	};
+
+	ext_buck_vsel_default: ext_buck_vsel {
+		pins = "gpio111";
 		function = "gpio";
 
 		drive-strength = <8>;
