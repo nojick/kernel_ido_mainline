@@ -46,28 +46,29 @@
 		CPU0: cpu@100 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x100>;
 			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc0>;
+			//qcom,acc = <&acc0>;
 			//qcom,saw = <&saw0>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
 			L2_1: l2-cache {
 				compatible = "cache";
 				cache-level = <2>;
-				power-domain = <&l2c_pd_1>;
 			};
 		};
 
 		CPU1: cpu@101 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x101>;
 			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc1>;
+			//qcom,acc = <&acc1>;
 			//qcom,saw = <&saw1>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
 		};
@@ -75,11 +76,12 @@
 		CPU2: cpu@102 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x102>;
 			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc2>;
+			//qcom,acc = <&acc2>;
 			//qcom,saw = <&saw2>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
 		};
@@ -87,11 +89,12 @@
 		CPU3: cpu@103 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x103>;
 			next-level-cache = <&L2_1>;
-			qcom,acc = <&acc3>;
+			//qcom,acc = <&acc3>;
 			//qcom,saw = <&saw3>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
 		};
@@ -99,28 +102,29 @@
 		CPU4: cpu@0 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x0>;
-			qcom,acc = <&acc4>;
+			//qcom,acc = <&acc4>;
 			//qcom,saw = <&saw4>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
 				compatible = "cache";
 				cache-level = <2>;
-				power-domain = <&l2c_pd_0>;
 			};
 		};
 
 		CPU5: cpu@1 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x1>;
 			next-level-cache = <&L2_0>;
-			qcom,acc = <&acc5>;
+			//qcom,acc = <&acc5>;
 			//qcom,saw = <&saw5>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
 		};
@@ -128,11 +132,12 @@
 		CPU6: cpu@2 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x2>;
 			next-level-cache = <&L2_0>;
-			qcom,acc = <&acc6>;
+			//qcom,acc = <&acc6>;
 			//qcom,saw = <&saw6>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
 		};
@@ -140,13 +145,24 @@
 		CPU7: cpu@3 {
 			compatible = "arm,cortex-a53";
 			device_type = "cpu";
-			enable-method = "qcom,kpss-acc-v2";
+			enable-method = "spin-table";
 			reg = <0x3>;
 			next-level-cache = <&L2_0>;
-			qcom,acc = <&acc7>;
+			//qcom,acc = <&acc7>;
 			//qcom,saw = <&saw7>;
+			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
+		};
+
+		idle-states {
+			CPU_SLEEP_0: cpu-sleep-0 {
+				compatible ="qcom,idle-state-spc", "arm,idle-state";
+				entry-latency-us = <130>;
+				exit-latency-us = <150>;
+				min-residency-us = <2000>;
+				local-timer-stop;
+			};
 		};
 	};
 
@@ -2276,16 +2292,6 @@
 				frame-number = <6>;
 				status = "disabled";
 			};
-		};
-
-		l2c_pd_1: power-domain@b011000 {
-			compatible = "qcom,l2c-pd";
-			reg = <0x0b011000 0x1000>;
-		};
-
-		l2c_pd_0: power-domain@b111000 {
-			compatible = "qcom,l2c-pd";
-			reg = <0x0b111000 0x1000>;
 		};
 
 		acc4: clock-controller@b188000 {
