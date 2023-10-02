@@ -23,7 +23,7 @@
 #include <linux/io.h>
 #include <linux/of.h>
 #include <linux/of_address.h>
-#include <linux/qcom_scm.h>
+#include <linux/firmware/qcom/qcom_scm.h>
 #include <linux/smp.h>
 
 #include <asm/barrier.h>
@@ -51,12 +51,12 @@ static DEFINE_PER_CPU(int, cold_boot_done);
 
 static void write_pen_release(u64 val)
 {
-	void *start = (void *)&secondary_holding_pen_release;
+	unsigned long start = (unsigned long)&secondary_holding_pen_release;
 	unsigned long size = sizeof(secondary_holding_pen_release);
 
 	secondary_holding_pen_release = val;
 	smp_wmb();
-	__flush_dcache_area(start, size);
+	dcache_clean_inval_poc(start, size);
 }
 
 static int secondary_pen_release(unsigned int cpu)
