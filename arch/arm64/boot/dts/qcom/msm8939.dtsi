@@ -49,8 +49,8 @@
 			enable-method = "spin-table";
 			reg = <0x100>;
 			next-level-cache = <&L2_1>;
-			//qcom,acc = <&acc0>;
-			//qcom,saw = <&saw0>;
+			qcom,acc = <&acc0>;
+			qcom,saw = <&saw0>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
@@ -66,8 +66,8 @@
 			enable-method = "spin-table";
 			reg = <0x101>;
 			next-level-cache = <&L2_1>;
-			//qcom,acc = <&acc1>;
-			//qcom,saw = <&saw1>;
+			qcom,acc = <&acc1>;
+			qcom,saw = <&saw1>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
@@ -79,8 +79,8 @@
 			enable-method = "spin-table";
 			reg = <0x102>;
 			next-level-cache = <&L2_1>;
-			//qcom,acc = <&acc2>;
-			//qcom,saw = <&saw2>;
+			qcom,acc = <&acc2>;
+			qcom,saw = <&saw2>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
@@ -92,8 +92,8 @@
 			enable-method = "spin-table";
 			reg = <0x103>;
 			next-level-cache = <&L2_1>;
-			//qcom,acc = <&acc3>;
-			//qcom,saw = <&saw3>;
+			qcom,acc = <&acc3>;
+			qcom,saw = <&saw3>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs1_mbox>;
 			#cooling-cells = <2>;
@@ -104,8 +104,8 @@
 			device_type = "cpu";
 			enable-method = "spin-table";
 			reg = <0x0>;
-			//qcom,acc = <&acc4>;
-			//qcom,saw = <&saw4>;
+			qcom,acc = <&acc4>;
+			qcom,saw = <&saw4>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
@@ -122,8 +122,8 @@
 			enable-method = "spin-table";
 			reg = <0x1>;
 			next-level-cache = <&L2_0>;
-			//qcom,acc = <&acc5>;
-			//qcom,saw = <&saw5>;
+			qcom,acc = <&acc5>;
+			qcom,saw = <&saw5>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
@@ -135,8 +135,8 @@
 			enable-method = "spin-table";
 			reg = <0x2>;
 			next-level-cache = <&L2_0>;
-			//qcom,acc = <&acc6>;
-			//qcom,saw = <&saw6>;
+			qcom,acc = <&acc6>;
+			qcom,saw = <&saw6>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
@@ -148,8 +148,8 @@
 			enable-method = "spin-table";
 			reg = <0x3>;
 			next-level-cache = <&L2_0>;
-			//qcom,acc = <&acc7>;
-			//qcom,saw = <&saw7>;
+			qcom,acc = <&acc7>;
+			qcom,saw = <&saw7>;
 			cpu-idle-states = <&CPU_SLEEP_0>;
 			clocks = <&apcs0_mbox>;
 			#cooling-cells = <2>;
