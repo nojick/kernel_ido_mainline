@@ -384,7 +384,7 @@ ramoops@xdfe00000 {
 	pinctrl-1 = <&mdss_sleep>;
 
 panel: panel@0 {		
-		compatible = "xiaomi,hx8394f-boe";
+		compatible = "xiaomi,ido-panel";
 		reg = <0>;
 		
 		power-supply = <&pm8916_l17>;
