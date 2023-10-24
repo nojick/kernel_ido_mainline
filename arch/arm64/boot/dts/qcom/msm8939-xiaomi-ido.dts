@@ -103,7 +103,6 @@ ramoops@xdfe00000 {
 		compatible = "gpio-keys";
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&gpio_keys_default>;
 
 		label = "GPIO Buttons";
 
@@ -111,13 +110,6 @@ ramoops@xdfe00000 {
 			label = "Volume Up";
 			gpios = <&tlmm 107 GPIO_ACTIVE_LOW>;
 			linux,code = <KEY_VOLUMEUP>;
-		};
-		
-		home {
-			label = "home";
-			gpios = <&tlmm 108 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_HOMEPAGE>;
-			gpio-key,wakeup;
 		};
 	};
 
@@ -525,14 +517,6 @@ ports {
 	};
 
 &tlmm {
-	gpio_keys_default: gpio-keys-default-state {
-		pins = "gpio107", "gpio108";
-		function = "gpio";
-
-		drive-strength = <2>;
-		bias-pull-up;
-	};
-
 	usb_id_default: usb-id-default {
 		pins = "gpio110";
 		function = "gpio";
