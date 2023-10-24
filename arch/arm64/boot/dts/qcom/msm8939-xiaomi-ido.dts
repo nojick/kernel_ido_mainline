@@ -121,12 +121,25 @@ ramoops@xdfe00000 {
 		};
 	};
 
-    bat: battery {
+    battery: battery-cell {
         compatible = "simple-battery";
         charge-full-design-microamp-hours = <4000000>;
+        over-voltage-threshold-microvolt = <4400000>;
 	voltage-max-design-microvolt = <4400000>;
 	voltage-min-design-microvolt = <3400000>;
 	constant-charge-current-max-microamp = <1800000>;
+	operating-range-celsius = <0 45>;
+        alert-celsius = <3 42>;
+	ocv-capacity-celsius = <25>;
+	ocv-capacity-table-0 = <4380000 100>, <4292000 95>,
+			<4234000 90>, <4190000 85>, <4158000 80>, <4125000 75>,
+			<4090000 70>, <4040000 65>, <3988000 60>, <3950000 55>,
+			<3925000 50>, <3880000 45>, <3840000 40>, <3800000 35>,
+			<3784000 30>, <3761000 25>, <3743000 20>, <3722000 16>,
+			<3702000 13>, <3690000 11>, <3688000 10>, <3687000 9>,
+			<3685000 8>, <3683000 7>, <3677000 6>, <3656000 5>,
+			<3612000 4>, <3554000 3>, <3462000 2>, <3322000 1>,
+			<3000000 0>;
     };
 
     usb_id: usb-id {
@@ -268,74 +281,43 @@ ramoops@xdfe00000 {
 	    regulator-always-on;
         };
 
-
 	power_supply: charger@57 {
 		compatible = "summit,smb358";
 		reg = <0x57>;
-
+		interrupt-parent = <&tlmm>;
+		interrupts = <62 IRQ_TYPE_LEVEL_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;	
 		summit,enable-charge-control = <SMB3XX_CHG_ENABLE_PIN_ACTIVE_HIGH>;
 		summit,soft-compensation-method = <SMB3XX_SOFT_TEMP_COMPENSATE_CURRENT>;
-		summit,chip-temperature-threshold-celsius = <100>;
-		summit,mains-current-limit-microamp = <1800000>;
-		summit,usb-current-limit-microamp = <1800000>;
-		summit,enable-usb-charging;
-		summit,enable-mains-charging;
-
-		monitored-battery = <&bat>;
+            	//summit,inok-polarity = <SMB3XX_SYSOK_INOK_ACTIVE_LOW>;
+            	summit,chip-temperature-threshold-celsius = <100>;
+            	//summit,mains-current-limit-microamp = <2000000>;
+            	summit,usb-current-limit-microamp = <500000>;
+            	summit,enable-usb-charging;
+		monitored-battery = <&battery>;
 
 		usb_vbus: usb-vbus {
 			regulator-name = "usb_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			regulator-min-microamp = <750000>;
-			regulator-max-microamp = <750000>;
-		};
+			regulator-min-microamp = <500000>;
+			regulator-max-microamp = <500000>;
 	};
-/*
+};
 	cw2015@62 {
 		compatible = "cellwise,cw2015";
 		reg = <0x62>;
-		cellwise,battery-profile = /bits/ 8 <
-			0x18 0x03 0x6A 0x6B 0x6D 0x6A 0x68 0x65
-			0x60 0x63 0x60 0x54 0x5D 0x59 0x48 0x40
-			0x38 0x31 0x27 0x24 0x28 0x31 0x43 0x4D
-			0x28 0x49 0x0B 0x85 0x1C 0x37 0x57 0x6E
-			0x79 0x7A 0x7A 0x7A 0x3D 0x1A 0x62 0x3F
-			0x0A 0x44 0x34 0x55 0x82 0x97 0x9B 0x13
-			0x41 0x81 0x94 0xC2 0x74 0x9C 0xBC 0xCB
-			0x2F 0x7D 0x72 0xA5 0xB5 0xC1 0x95 0x61
-		>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <120 IRQ_TYPE_LEVEL_LOW>;
 		cellwise,monitor-interval-ms = <1000>;
-		monitored-battery = <&bat>;
+		vdd-supply = <&pm8916_l17>;
+		vcc_i2c-supply = <&pm8916_l6>;
+		monitored-battery = <&battery>;
 		power-supplies = <&power_supply>;
-	};
-*/
+		};
 };
 
-/*
-&blsp_i2c4 {
-        #address-cells = <1>;
-        #size-cells = <0>;
-
-        cw2015@62 {
-            compatible = "cellwise,cw2015";
-            reg = <0x62>;
-            cellwise,battery-profile = /bits/ 8 <
-                0x17 0x67 0x80 0x73 0x6E 0x6C 0x6B 0x63
-                0x77 0x51 0x5C 0x58 0x50 0x4C 0x48 0x36
-                0x15 0x0C 0x0C 0x19 0x5B 0x7D 0x6F 0x69
-                0x69 0x5B 0x0C 0x29 0x20 0x40 0x52 0x59
-                0x57 0x56 0x54 0x4F 0x3B 0x1F 0x7F 0x17
-                0x06 0x1A 0x30 0x5A 0x85 0x93 0x96 0x2D
-                0x48 0x77 0x9C 0xB3 0x80 0x52 0x94 0xCB
-                0x2F 0x00 0x64 0xA5 0xB5 0x11 0xF0 0x11
-           >;
-           cellwise,monitor-interval-ms = <5000>;
-           monitored-battery = <&bat>;
-           //power-supplies = <&mains_charger>, <&usb_charger>;
-       };
-    };
-*/
 &blsp_i2c5 {
 	status = "okay";
 
@@ -440,13 +422,12 @@ ports {
 &mdss {
 	status = "okay";
 };
-/*
+
 &pm8916_bms {
 	status = "okay";
-
-	monitored-battery = <&bat>;
+	monitored-battery = <&battery>;
 };
-*/
+
 &pm8916_pwm {
 	status = "okay";
 	pinctrl-names = "default";
@@ -491,15 +472,12 @@ ports {
 &usb {
 	status = "okay";
 	extcon = <&usb_id>, <&usb_id>;
-	//vbus-supply = <&power_supply>;
+	vbus-supply = <&usb_vbus>;
 };
 
 &usb_hs_phy {
 	extcon = <&usb_id>;
- 
-	v1p8-supply = <&pm8916_l7>;
-	v3p3-supply = <&pm8916_l13>;
-
+	status = "okay";
 };
 
 
