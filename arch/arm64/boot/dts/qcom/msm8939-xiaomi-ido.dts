@@ -54,7 +54,7 @@ panel {
 	chosen {
 		stdout-path = "serial0";
 		
-		bootargs = "fbcon=nodefer earlycon=tty0 console=tty0";
+		bootargs = "fbcon=nodefer earlycon=tty0 console=tty0 clk_ignore_unused pd_ignore_unused";
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
@@ -366,7 +366,7 @@ ramoops@xdfe00000 {
 		};
 	};
 };
-
+/*
 &mdss_dsi0 {
 	status = "okay";
 	vdda-supply = <&pm8916_l2>;
@@ -414,7 +414,7 @@ ports {
 &mdss {
 	status = "okay";
 };
-
+*/
 &pm8916_bms {
 	status = "okay";
 	monitored-battery = <&battery>;
