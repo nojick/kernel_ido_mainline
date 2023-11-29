@@ -7,7 +7,6 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/qcom,pmic-mpp.h>
 #include <dt-bindings/leds/common.h>
-#include <dt-bindings/sound/apq8016-lpass.h>
 #include <dt-bindings/power/summit,smb347-charger.h>
 
 / {
@@ -16,49 +15,42 @@
 	chassis-type = "handset";
 	qcom,msm-id = <239 0>;
 	qcom,board-id = <0x1000b 11>, <0x2000b 11>;
-/*
-panel {
-		compatible = "xiaomi,hx8394fboe";
-		qcom,mdss_dsi_ili9881c_tianma_720p_video {
-			compatible = "xiaomi,tianma-ili9881c";
-		};
 
-		qcom,mdss_dsi_nt35521s_ebbg_720p_video {
-			compatible = "xiaomi,nt35521s-ebbg";
-		};
-
-		qcom,mdss_dsi_nt35596_1080p_video {
-			compatible = "xiaomi,nt35596";
-		};
-
-		qcom,mdss_dsi_r63350_1080p_video {
-			compatible = "xiaomi,r63350";
-		};
-
-		qcom,mdss_dsi_nt35596_1080p_skuk_video {
-			compatible = "mdss,nt35596-skuk";
-		};
-
-		qcom,mdss_dsi_hx8394f_boe_720p_video {
-			compatible = "xiaomi,hx8394f-boe";
-		};
-	};
-
-*/
 	aliases {
 		mmc0 = &sdhc_1; /* eMMC */
 		mmc1 = &sdhc_2; /* SD card */
 		serial0 = &blsp_uart2;
 	};
 
+	speaker_amp: audio-amplifier {
+		compatible = "simple-audio-amplifier";
+
+		pinctrl-0 = <&spk_ext_default>;
+		pinctrl-names = "default";
+
+		enable-gpios = <&tlmm 121 GPIO_ACTIVE_HIGH>;
+		awinic,mode = <3>;
+		sound-name-prefix = "Speaker Amp";
+	};
+
+	headphones_switch: audio-switch {
+		compatible = "simple-audio-amplifier";
+
+		pinctrl-0 = <&headphones_switch_default>;
+		pinctrl-names = "default";
+
+		enable-gpios = <&tlmm 8 GPIO_ACTIVE_HIGH>;
+		sound-name-prefix = "Headphones Switch";
+	};
+
+
 	chosen {
 		stdout-path = "serial0";
-		
 		bootargs = "earlycon=tty0 console=tty0";
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
-/*
+
 		framebuffer0: framebuffer@83003000 {
 			status= "okay";
 			compatible = "simple-framebuffer";
@@ -68,31 +60,18 @@ panel {
 			stride = <(720 * 3)>;
 			format = "r8g8b8";
 		};
-*/		
 
 	};
 
     reserved-memory {
-        /delete-node/ rmtfs@86681000;
-		/delete-node/ rfsa@867e0000;
 		/delete-node/ tz-apps@86000000;
 
-ramoops@xdfe00000 {
-			compatible = "ramoops";
-			reg = <0 0xdfe00000 0 0x100000>;
-			record-size = <0x4000>;
-			console-size = <0x4000>;
-};
-/*
 		cont_splash_mem: framebuffer@83000000 {
+			compatible = "removed-dma-pool";
 			reg = <0x0 0x83000000 0x0 0x2000000>;
 			no-map;
 		};
-*/
-		mpss_mem: mpss@86800000 {
-			reg = <0x0 0x86800000 0x0 0x5500000>;
-			no-map;
-		};
+
         tz-apps@8c400000 {
 			reg = <0x0 0x8c400000 0x0 0x1900000>;
 			no-map;
@@ -147,16 +126,12 @@ ramoops@xdfe00000 {
 
 		brightness-levels = <0 255>;
 		num-interpolated-steps = <255>;
-		default-brightness-level = <130>;
+		default-brightness-level = <255>;
 	};
 };
 
-&blsp_dma {
-	status = "okay";
-};
-
 &blsp_uart2 {
-	status = "disabled";
+	status = "okay";
 };
 
 &blsp_i2c2 {
@@ -186,7 +161,7 @@ ramoops@xdfe00000 {
 		};
 	};
 
-	bma253@18 {
+		bma253@18 {
 		compatible = "bosch,bma253";
 		reg = <0x18>;
 		pinctrl-names = "default","sleep";
@@ -253,25 +228,11 @@ ramoops@xdfe00000 {
 		pinctrl-1 = <&mpu6050_sleep>;
 		pinctrl-names = "default","sleep";
 	};
-
 };
 
 &blsp_i2c4 {
 
 	status = "okay";
-
-        regulator@60 {
-            compatible = "fcs,fan53555";
-            reg = <0x60>;
-            regulator-name = "fan53555";
-            pinctrl-names = "default";
-	    pinctrl-0 = <&ext_buck_vsel_default>;
-            regulator-min-microvolt = <1050000>;
-            regulator-max-microvolt = <1350000>;
-            enable-gpios = <&tlmm 111 GPIO_ACTIVE_HIGH>;
-            regulator-boot-on;
-	    regulator-always-on;
-        };
 
 	power_supply: charger@57 {
 		compatible = "summit,smb358";
@@ -282,9 +243,7 @@ ramoops@xdfe00000 {
 		pinctrl-0 = <&smb_int_default>;	
 		summit,enable-charge-control = <SMB3XX_CHG_ENABLE_PIN_ACTIVE_HIGH>;
 		summit,soft-compensation-method = <SMB3XX_SOFT_TEMP_COMPENSATE_CURRENT>;
-            	//summit,inok-polarity = <SMB3XX_SYSOK_INOK_ACTIVE_LOW>;
             	summit,chip-temperature-threshold-celsius = <100>;
-            	//summit,mains-current-limit-microamp = <2000000>;
             	summit,usb-current-limit-microamp = <500000>;
             	summit,enable-usb-charging;
 		monitored-battery = <&battery>;
@@ -415,9 +374,8 @@ ports {
 	status = "okay";
 };
 
-&pm8916_bms {
-	status = "okay";
-	monitored-battery = <&battery>;
+&mpss_mem {
+	reg = <0x0 0x86800000 0x0 0x05600000>;
 };
 
 &pm8916_pwm {
@@ -461,6 +419,42 @@ ports {
 	cd-gpios = <&tlmm 38 GPIO_ACTIVE_HIGH>;
 };
 
+&sound {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&cdc_pdm_default>;
+	pinctrl-1 = <&cdc_pdm_sleep>;
+
+	model = "xiaomi-ido";
+	widgets = 
+		"Speaker", "Speaker",
+		"Headphone", "Headphones";
+	pin-switches = "Speaker", "Headphones";
+	audio-routing =
+		"Speaker", "Speaker Amp OUTL",
+		"Speaker", "Speaker Amp OUTR",
+		"Speaker Amp INL", "HPH_R",
+		"Speaker Amp INR", "HPH_R",
+		"Headphones", "Headphones Switch OUTL",
+		"Headphones", "Headphones Switch OUTR",
+		"Headphones Switch INL", "HPH_L",
+		"Headphones Switch INR", "HPH_R",
+		"AMIC1", "MIC BIAS External1",
+		"AMIC2", "MIC BIAS Internal2",
+		"AMIC3", "MIC BIAS External1";
+	aux-devs = <&speaker_amp>, <&headphones_switch>;
+};
+
+&pm8916_codec {
+	qcom,micbias-lvl = <2800>;
+	qcom,mbhc-vthreshold-low = <25 200 325 375 430>;
+	qcom,mbhc-vthreshold-high = <75 225 400 410 450>;
+	qcom,micbias1-ext-cap;
+	qcom,hphl-jack-type-normally-open;
+	status = "okay";
+};
+
 &usb {
 	status = "okay";
 	extcon = <&usb_id>, <&usb_id>;
@@ -469,7 +463,6 @@ ports {
 
 &usb_hs_phy {
 	extcon = <&usb_id>;
-	status = "okay";
 };
 
 
@@ -525,15 +518,21 @@ ports {
 		bias-pull-up;
 	};
 
-	ext_buck_vsel_default: ext_buck_vsel {
-		pins = "gpio111";
+	headphones_switch_default: headphones-switch-default-state {
+		pins = "gpio8";
 		function = "gpio";
-
-		drive-strength = <8>;
-		bias-pull-up;
+		drive-strength = <2>;
+		bias-disable;
 	};
 
-smb_int_default: smb-int-default-state {
+	spk_ext_default: spk-ext-default-state {
+		pins = "gpio121";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-disable;
+	};
+
+	smb_int_default: smb-int-default-state {
 		pins = "gpio62";
 		function = "gpio";
 
@@ -558,7 +557,7 @@ smb_int_default: smb-int-default-state {
 		};
 	};
 
-    bma2x2_int1_pin {
+	bma2x2_int1_pin {
 		bma2x2_int1_default: int1_default {
 			pins = "gpio112";
 			function = "gpio";
@@ -592,7 +591,7 @@ smb_int_default: smb-int-default-state {
 		};
 	};
 
-    ltr559_int_pin {
+	ltr559_int_pin {
 		alsps_default: alsps_default {
 			pins = "gpio113";
 			function = "gpio";
@@ -609,7 +608,7 @@ smb_int_default: smb-int-default-state {
 		};
 };
 
-    mpu6050_int_pin {
+	mpu6050_int_pin {
 		mpu6050_default: mpu6050_default {
 			pins = "gpio115";
 			function = "gpio";
@@ -626,7 +625,7 @@ smb_int_default: smb-int-default-state {
 		};
 	};
 
-touchscreen_default: touchscreen-default {
+    touchscreen_default: touchscreen-default {
 		pins = "gpio13";
 		function = "gpio";
 
@@ -642,7 +641,7 @@ touchscreen_default: touchscreen-default {
 		};
 	};
 
-	tps65132_en_default: tps65132-en-default {
+    tps65132_en_default: tps65132-en-default {
 		pins = "gpio97", "gpio98";
 		function = "gpio";
 
